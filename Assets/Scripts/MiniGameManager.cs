@@ -8,16 +8,25 @@ public class MiniGameManager : MonoBehaviour
     [SerializeField] List<MiniGameControl> miniGames;
     private int currentMiniGameIndex;
 
+    [SerializeField] private InstructionControl instructionControl;
 
-    public void InitializeMiniGame()
+   
+    
+    public void StartMiniGame(MiniGameControl miniGame)
     {
-        MiniGameControl currentMiniGame = GetCurrentMiniGame();
-        currentMiniGame.gameObject.SetActive(true);
+        currentMiniGameIndex = miniGames.IndexOf(miniGame);
+        if (currentMiniGameIndex != -1)
+        {
 
-    }  
-    
+        }
 
-    
+        else
+        {
+            Debug.LogError("Mini-game not found in the list.");
+        }
+    }
+
+
     public MiniGameControl GetCurrentMiniGame()
     {
         return miniGames[currentMiniGameIndex];
@@ -32,5 +41,7 @@ public class MiniGameManager : MonoBehaviour
     {
         return miniGames[(currentMiniGameIndex - 1 + miniGames.Count) % miniGames.Count];
     }
+
+  
 
 }

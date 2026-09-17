@@ -1,48 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class MiniGameControl : MonoBehaviour
+public abstract class MiniGameControl : MonoBehaviour
 {
 
-    public string miniGameName { get; private set; }
-    public string instruction { get; private set; }
-    public float duration { get; private set; }
-    public float instructionDuration { get; private set; }
-    public InputActionMap inputScheme { get; private set; }
+    [SerializeField] private string miniGameName; 
+    [SerializeField] private string instruction; 
+    [SerializeField] private float duration;
+    [SerializeField] private InputActionMap inputScheme; 
     public bool isGameRunning { get; private set; }
-    public bool isGameSuccess { get; private set; }
 
 
-    public virtual void StartMiniGame()
+
+    public virtual void InitializeGame()
     {
-        RunGame();
+        isGameRunning = false;
+        StartCoroutine(StartGame());
+
     }
 
 
-    public virtual IEnumerator RunGame()
+    public abstract IEnumerator StartGame();
+
+
+    public abstract bool CheckGameSuccess();
+
+
+    #region Getter Methods
+    public string GetMiniGameName()
     {
-        Debug.Log($"Starting mini-game: {miniGameName}");
-        yield return null; 
+        return miniGameName;
+    }
+    public string GetInstruction()
+    {
+        return instruction;
     }
 
-   
-    public virtual IEnumerator DisplayInstructions(TextMeshProUGUI label, float duration)
+    public float GetDuration()
     {
-        label.gameObject.SetActive(true);
-        label.text = instruction;
-        
-        yield return new WaitForSeconds(duration);
-        
-        label.gameObject.SetActive(false);
-    
+        return duration;
+    }
+    public InputActionMap GetInputScheme()
+    {
+        return inputScheme;
     }
 
+    public void SetIsGameRunning(bool value)
+    {
+        isGameRunning = value;
+    }
 
-    
-
+    #endregion
 
 }
