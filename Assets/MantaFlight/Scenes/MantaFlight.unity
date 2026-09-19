@@ -32719,6 +32719,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4020314695378747994, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
+      propertyPath: settings
+      value: 
+      objectReference: {fileID: 11400000, guid: e246876735759f343948397857e87db4, type: 2}
+    - target: {fileID: 5349899912234267986, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
+      propertyPath: stickDeadZone
+      value: 0.528
+      objectReference: {fileID: 0}
     - target: {fileID: 8983966047545956357, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
       propertyPath: m_Name
       value: "Manta \u2022 Rider Rig"

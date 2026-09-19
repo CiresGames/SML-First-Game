@@ -32,7 +32,11 @@ Le pitch n’est pas inversé par défaut : pousser le stick vers le haut fait m
 - `Settings/FlightSettings.asset` contient les vitesses, accélérations, inertie, vitesses angulaires, banking, énergie des plongeons, figures, caméra et animations.
 - `MantaInput` expose zone morte, courbe de sensibilité, sensibilité souris et inversion.
 - L’atelier donne accès aux réglages les plus fréquents pendant le jeu. Ils modifient une **copie de session** du profil.
-- Pour garder une session de tuning, utiliser **Manta → Save current tuning as new preset**, puis assigner ce nouvel asset au `MantaController` hors Play mode. Les réglages d’entrée sont propres au composant `MantaInput` ; seul le remappage est automatiquement persistant.
+- Pour éditer le profil réellement utilisé en Play Mode, utiliser **Manta → Tuning → Select active settings**. Il s’agit d’une copie de session : modifier le profil source n’altère pas le vol déjà lancé.
+- **Manta → Tuning → Save runtime as new profile** crée un nouvel asset indépendant. Après avoir quitté Play Mode, l’assigner au champ `Settings` du `MantaController` pour le réutiliser. L’ancien menu **Save current tuning as new preset** reste disponible.
+- **Manta → Tuning → Write runtime to source profile** écrit directement les valeurs de session dans le profil source et les sauvegarde sur disque. Cette action propose Undo dans l’éditeur.
+- Ces exports couvrent les paramètres de vol, caméra, animations, les deux profils de looping, le demi-tour d’impact et les réglages actuels du composant `MantaInput`. Les sensibilités et l’inversion se règlent sur ce composant pendant le jeu ; leur copie exportée est réappliquée au prochain démarrage. Le remappage reste enregistré séparément dans PlayerPrefs.
+- Avec plusieurs mantas dans la scène, sélectionner celle à exporter. Aucun code de l’outil d’export n’est inclus dans le build : il réside dans `Editor/`.
 
 Valeurs de départ : croisière 28 m/s, minimum 12, propulsion maximale 64, plafond de plongeon 90 ; FOV 58–76° avec un supplément de 4° maximum pour plongeon et proximité du sol. Distance caméra 13–18 m. L’inertie directionnelle vaut 4,5 ; une valeur supérieure fait suivre plus vite la direction visée.
 
@@ -42,7 +46,21 @@ Phases cumulatives : **BasicFlight** (vitesse, direction, banking, caméra), **S
 
 La vallée couvre environ 2,4 km de côté. Depuis le départ : lagon et arche devant, canyon au-delà ; slalom de piliers à gauche ; tunnel bas à droite ; jardin vertical et plateformes flottantes à droite au fond. L’espace autour de ces zones reste ouvert pour les grandes courbes et les loopings. Les repères orangés du canyon rendent la vitesse visible près du sol.
 
-Les collisions utilisent une sphère de gameplay de 1,4 m autour du corps, avec balayage et glissement. Les extrémités des ailes sont décoratives : elles peuvent effleurer le décor. Une collision interrompt une figure et réduit la vitesse. Le retour automatique au départ intervient sous −80 m ou au-delà de 4 km du centre ; R permet toujours un retour immédiat.
+Les collisions utilisent une sphère de gameplay de 1,4 m autour du corps, avec balayage et glissement. Les extrémités des ailes sont décoratives : elles peuvent effleurer le décor. Un impact frontal suffisamment rapide déclenche le demi-tour décrit ci-dessous. Les autres collisions gardent le glissement et la réduction de vitesse précédents. Le retour automatique au départ intervient sous −80 m ou au-delà de 4 km du centre ; R permet toujours un retour immédiat.
+
+## Loopings locaux et esquive anticipée
+
+`Forward Loop` et `Backward Loop` partagent la même logique et possèdent des paramètres indépendants. La racine poursuit le vol dans la direction d’entrée ; le modèle et le rider décrivent une boucle locale de rayon `Visual Radius` (1,5 m initialement). Valeurs initiales : 2,8 s à l’avant, 3 s à l’arrière ; anticipation à 96 % de la vitesse d’entrée ; surplus central de 22 % / 25 % avant plafonnement ; sortie à 100 %. La rotation et l’arc local utilisent la même progression, avec une entrée lente, un passage central rapide et une sortie amortie.
+
+Le mode `Duration` fixe la durée. Le mode historique `Nominal Radius` calcule seulement la durée à partir de la vitesse d’entrée et du rayon nominal, dans les bornes configurées. `Visual Radius` règle indépendamment la taille visible de la figure. Les collisions restent portées par la racine : comme les ailes, la boucle du modèle est décorative. `Visual Recovery Time` règle son retour en position après une interruption.
+
+Les inputs sont verrouillés 0,22 s par défaut, puis le joueur peut infléchir la sortie dans une limite de 12°. Le frein au-delà de 65 % interrompt la figure après ce verrouillage. Une sortie à l’envers redresse progressivement le modèle. `Input Lock Time`, `Steering Influence`, sa courbe, `Maximum Exit Deviation` et `Brake Can Cancel` permettent de choisir un comportement plus libre ou plus verrouillé. Les paramètres d’une figure sont figés à son déclenchement : le tuning s’applique à la figure suivante.
+
+`Swerve` remplace le demi-tour automatique. Un spherecast anticipe les obstacles sur `Look Ahead Distance + vitesse × Look Ahead Seconds` (5 m + 1,2 s initialement). Il intervient à partir de 18 m/s et jusqu’à 50° de la normale opposée (0° = choc de face). Les layers doivent aussi appartenir au masque de collision ; un tag optionnel peut filtrer le collider. La phase AdvancedManeuvers ou Polish doit être active. Sous les seuils, le glissement existant est conservé.
+
+L’esquive compare quatre directions tangentes avec des sondes de dégagement, puis infléchit progressivement le cap. Elle dure initialement 0,85 s, conserve au moins 88 % de la vitesse et revient à 100 %, dans les limites globales du vol. Les inputs sont partiellement actifs après 0,08 s ; influence nulle pour les verrouiller. Le frein peut annuler lorsque la manta est déjà orientée vers l’extérieur. `Camera Offset`, `Camera Yaw`, `Camera Roll`, leur enveloppe et les durées de blend règlent le mouvement de caméra, modulé par proximité et vitesse.
+
+Les surfaces successives ajustent l’échappée sans redémarrer l’animation. Le délai de récupération filtre une même surface, mais autorise une nouvelle esquive pour un autre obstacle. Le balayage de collision reste prioritaire si l’obstacle est déjà très proche. Une esquive interrompt un looping et ramène doucement le modèle. Les anciens profils conservent leurs réglages d’impact lors de la migration vers `Swerve`.
 
 ## Architecture
 
@@ -59,13 +77,15 @@ Les collisions utilisent une sphère de gameplay de 1,4 m autour du corps, avec 
 
 Le prefab `Prefabs/MantaRider.prefab` sépare le mouvement, le modèle et le socket `Rider Attachment • future mount socket`. Le rider pourra être remplacé ou détaché ultérieurement sans refaire le contrôleur. Le Rigidbody est cinématique et interpolé ; les ailes n’influencent pas les collisions.
 
-Les loopings décrivent une trajectoire avec vitesse conservée. Les rolls sont visuels et laissent le cap pilotable. Le demi-tour conserve 85 % de la vitesse et choisit son côté selon la direction pressée. La caméra ignore les rolls complets, amortit les changements de cap et limite l’angle de suivi vertical.
+Les rolls sont visuels et laissent le cap pilotable. Le demi-tour manuel conserve 85 % de la vitesse et choisit son côté selon la direction pressée. Il reste distinct du demi-tour d’impact. La caméra ignore les rolls complets, amortit les changements de cap et limite l’angle de suivi vertical.
 
-Pendant un looping, la caméra recule vers un cadrage fixe qui englobe la trajectoire entière. La manta effectue sa figure dans ce cadre : la caméra ne poursuit ni son pitch, ni son cap, ni sa position instantanée. Le FOV reste stable. Le suivi normal revient progressivement à la sortie, y compris si la figure est interrompue. Les paramètres `Loop Camera Padding`, `Loop Camera Pullback Time` et `Loop Camera Return Time` règlent la marge, le recul et la reprise du suivi. Les collisions avec le décor restent prioritaires sur le maintien de la distance.
+Pendant un looping, `Loop Camera` rapproche la caméra à 11 m derrière la racine. Le suivi ignore la rotation et la position locales du modèle : l’horizon reste stable. Distance, offset, point de visée, amortissements, variation de FOV et durées de blend sont réglables dans ce groupe. Le suivi normal revient progressivement, y compris après interruption. Les collisions caméra restent prioritaires. Tous ces paramètres, ainsi que ceux de `Swerve`, sont inclus dans les deux exports du menu **Manta → Tuning**.
 
 ## Vérifications
 
 En Play mode : **Manta → Validate current flight phase (Play mode)**. Les essais font avancer la simulation réelle puis replacent la manta. Les rapports sont écrits dans `Logs/MantaFlight/` (dossier ignoré par Git). `MantaFlightValidation.ValidateCameraAndRebind()` vérifie séparément caméra et capture interactive.
+
+**Manta → Validate loops, impacts and tuning export (Play mode)** vérifie le surplus de vitesse, la synchronisation rotation/trajectoire, les inputs et sorties, le mode rayon, les contacts frontaux/rasants, les coins, les surfaces successives, les pentes et les collisions en looping. Il vérifie aussi la copie indépendante des courbes, la sauvegarde sur disque et l’écrasement d’un profil temporaire, puis supprime uniquement cet asset de test. `MantaLoopCameraValidation.Run()` vérifie le cadrage fixe des deux loopings à plusieurs vitesses.
 
 Vérifications couvertes : accélération/freinage, limites de pitch, banking, comparaison 50/100 Hz, collision contre une paroi de 15 cm, énergie plongeon/remontée, les cinq figures, virage serré, sticks/gâchettes virtuels, zones mortes, persistance des liaisons, reset, FOV, horizon pendant les figures, collision caméra et annulation du remappage.
 

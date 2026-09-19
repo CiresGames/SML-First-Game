@@ -34,7 +34,11 @@ namespace MantaFlight
         [Min(1)] public float tightTurnMultiplier = 2.3f;
         [Min(0)] public float tightTurnDrag = 7;
         [Min(.2f)] public float barrelDuration = .85f;
-        [Min(1)] public float loopDuration = 3.4f;
+        [HideInInspector] public float loopDuration = 3.4f; // Retained for legacy serialized profiles.
+        [Header("Loopings — shared logic, independent feel")]
+        public MantaLoopSettings forwardLoop = new MantaLoopSettings();
+        public MantaLoopSettings backwardLoop = new MantaLoopSettings { duration = 3, middleSpeedBoost = .25f };
+        [Header("Manual turnaround")]
         [Min(.3f)] public float turnaroundDuration = 1.25f;
         [Range(.5f, 1)] public float turnaroundSpeedRetention = .85f;
         [Min(0)] public float maneuverCooldown = .25f;
@@ -42,6 +46,12 @@ namespace MantaFlight
         public LayerMask environmentMask = 1;
         [Min(.1f)] public float collisionRadius = 1.4f;
         [Min(0)] public float collisionSkin = .12f;
+        [UnityEngine.Serialization.FormerlySerializedAs("impactTurn")]
+        public MantaImpactSettings swerve = new MantaImpactSettings();
+        public MantaImpactSettings impactTurn => swerve; // Compatibility with existing editor integrations.
+        [Header("Input profile — exported with runtime tuning")]
+        public bool useProfileInput;
+        public MantaInputSettings input = new MantaInputSettings();
         [Header("Camera")]
         [Range(40, 100)] public float minimumFOV = 58;
         [Range(40, 110)] public float maximumFOV = 76;
@@ -53,13 +63,14 @@ namespace MantaFlight
         [Min(0)] public float cameraAnticipation = .18f;
         [Range(0, .5f)] public float cameraBankFraction = .12f;
         [Min(.1f)] public float cameraCollisionRadius = .45f;
-        [Header("Loop camera — hold a wide shot of the whole maneuver")]
-        [Min(1)] public float loopCameraPadding = 7;
-        [Min(.01f)] public float loopCameraPullbackTime = .22f;
-        [Min(.1f)] public float loopCameraReturnTime = 1.1f;
+        [Header("Loop camera - close root follow")]
+        public MantaLoopCameraSettings loopCamera = new MantaLoopCameraSettings();
+        [HideInInspector] [Min(1)] public float loopCameraPadding = 7;
+        [HideInInspector] [Min(.01f)] public float loopCameraPullbackTime = .22f;
+        [HideInInspector] [Min(.1f)] public float loopCameraReturnTime = 1.1f;
         [Header("Living creature")]
-        [Range(0, 2)] public float animationIntensity = 1;
-        [Range(0, 30)] public float wingAmplitude = 12;
+        [Range(0, 5)] public float animationIntensity = 1;
+        [Range(0, 50)] public float wingAmplitude = 12;
         [Range(.1f, 3)] public float wingFrequency = .65f;
         [Range(0, 1)] public float speedEffectsIntensity = .65f;
 

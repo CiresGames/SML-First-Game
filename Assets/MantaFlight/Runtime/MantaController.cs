@@ -6,6 +6,7 @@ namespace MantaFlight
     public sealed class MantaController : MonoBehaviour
     {
         public MantaFlightSettings settings;
+        public MantaFlightSettings SourceSettings { get; private set; }
         public float Speed { get; private set; }
         public Vector3 Velocity { get; private set; }
         public Quaternion Heading { get; private set; }
@@ -24,12 +25,14 @@ namespace MantaFlight
         float pitch, yaw, yawRate, pitchRate;
         int groundCounter;
         bool recoveringOrientation;
+        float recoverySpeed;
 
         void Awake()
         {
             // Play-mode tuning never edits the shared asset accidentally.
-            settings = Instantiate(settings);
+            SourceSettings = settings; settings = Instantiate(settings);
             body = GetComponent<Rigidbody>(); input = GetComponent<MantaInput>(); maneuvers = GetComponent<MantaManeuvers>();
+            if (settings.useProfileInput) settings.input.Apply(input);
             body.isKinematic = true; body.useGravity = false; body.interpolation = RigidbodyInterpolation.Interpolate;
             spawnPosition = transform.position; spawnRotation = transform.rotation;
             input.ResetRequested += ResetFlight;
@@ -50,6 +53,7 @@ namespace MantaFlight
             bool energy = s.Has(FlightPhase.SpeedAndCamera);
             bool tight = advanced && state.tightTurn;
             float before = Speed;
+            maneuvers.ProbeObstacles(this);
             if (!maneuvers.LocksSpeed)
             {
                 float power = state.throttle * s.acceleration * Mathf.Max(.1f, s.accelerationCurve.Evaluate(Speed01));
@@ -76,10 +80,10 @@ namespace MantaFlight
                 yaw += yawRate * dt;
                 pitch = Mathf.Clamp(pitch + pitchRate * dt, -s.pitchLimit, s.pitchLimit);
                 Quaternion stableHeading = Quaternion.Euler(pitch, yaw, 0);
-                Heading = recoveringOrientation ? Quaternion.RotateTowards(Heading, stableHeading, s.rollSpeed * dt) : stableHeading;
+                Heading = recoveringOrientation ? Quaternion.RotateTowards(Heading, stableHeading, recoverySpeed * dt) : stableHeading;
                 if (Quaternion.Angle(Heading, stableHeading) < .1f) recoveringOrientation = false;
             }
-            maneuvers.Step(this, dt);
+            maneuvers.Step(this, dt, state);
             float targetBank = -state.steering.x * s.maximumBanking * Mathf.Lerp(.55f, 1, Speed01) * (tight ? 1.55f : 1);
             targetBank = Mathf.Clamp(targetBank, -78, 78);
             float easedBank = Mathf.Lerp(Bank, targetBank, MantaFlightSettings.Damp(s.bankingSmoothing, dt));
@@ -87,6 +91,7 @@ namespace MantaFlight
             Vector3 wanted = Heading * Vector3.forward;
             Vector3 direction = Vector3.Slerp(Velocity.sqrMagnitude > .01f ? Velocity.normalized : wanted, wanted,
                 MantaFlightSettings.Damp(maneuvers.ControlsHeading ? 28 : s.momentumResponse * (tight ? 2 : 1), dt)).normalized;
+            if (maneuvers.HasTravelOverride) direction = maneuvers.TravelDirection;
             Velocity = direction * Speed;
             MoveSafely(Velocity * dt);
             body.MoveRotation(Heading);
@@ -107,10 +112,17 @@ namespace MantaFlight
                 { position += delta; break; }
                 float travel = Mathf.Clamp(hit.distance - settings.collisionSkin, 0, length);
                 position += delta.normalized * travel;
+                if (maneuvers.IsImpactTurning || maneuvers.TryImpact(this, hit, delta.normalized))
+                {
+                    maneuvers.ResolveImpactContact(hit.normal);
+                    Velocity = maneuvers.TravelDirection * Speed;
+                    delta = maneuvers.TravelDirection * (length - travel);
+                    continue;
+                }
                 delta = Vector3.ProjectOnPlane(delta.normalized * (length - travel), hit.normal);
                 Speed = Mathf.Max(settings.minimumSpeed, Speed * .85f);
                 Velocity = Vector3.ProjectOnPlane(Velocity, hit.normal);
-                recoveringOrientation |= maneuvers.ControlsHeading;
+                if (maneuvers.ControlsHeading) BeginManeuverRelease(settings.rollSpeed);
                 maneuvers.Cancel();
                 SyncAngles();
             }
@@ -124,10 +136,16 @@ namespace MantaFlight
             if (new Vector2(forward.x, forward.z).sqrMagnitude > .0001f) yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
         }
         public void ScaleSpeed(float factor) { Speed *= factor; }
+        public void SetSpeed(float value) => Speed = Mathf.Clamp(value, settings.minimumSpeed, settings.diveMaximumSpeed);
+        public void BeginManeuverRelease(float uprightSpeed)
+        {
+            SyncAngles(); yawRate = pitchRate = 0;
+            recoveringOrientation = true; recoverySpeed = Mathf.Max(1, uprightSpeed);
+        }
         public void ResetFlight()
         {
             if (body == null) return;
-            maneuvers.Cancel(); Heading = spawnRotation; SyncAngles();
+            maneuvers.ResetState(); Heading = spawnRotation; SyncAngles();
             yawRate = pitchRate = Bank = Acceleration = 0; recoveringOrientation = false;
             Speed = settings.cruiseSpeed; Velocity = Heading * Vector3.forward * Speed;
             body.position = spawnPosition; body.rotation = Heading;

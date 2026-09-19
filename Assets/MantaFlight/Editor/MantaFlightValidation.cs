@@ -88,7 +88,7 @@ namespace MantaFlight.Editor
                         AtAltitude(); Vector3 start = manta.GetComponent<Rigidbody>().position; float initialSpeed = manta.Speed;
                         Check(tricks.TryStart(trick, manta), trick + " starts");
                         Check(!tricks.TryStart(MantaTrick.RollLeft, manta), "Concurrent maneuver is rejected");
-                        float duration = trick == MantaTrick.Turnaround ? manta.settings.turnaroundDuration : trick == MantaTrick.RollLeft || trick == MantaTrick.RollRight ? manta.settings.barrelDuration : manta.settings.loopDuration;
+                        float duration = tricks.Duration;
                         Advance(default, duration * .5f);
                         Check(Vector3.Distance(start, manta.GetComponent<Rigidbody>().position) > 6, trick + " travels through space");
                         Advance(default, duration * .5f + .04f);

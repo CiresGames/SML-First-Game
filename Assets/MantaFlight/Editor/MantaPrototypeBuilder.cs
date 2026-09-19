@@ -18,13 +18,7 @@ namespace MantaFlight.Editor
         [MenuItem("Manta/Save current tuning as new preset")]
         public static void SaveTuning()
         {
-            var controller = Object.FindFirstObjectByType<MantaController>();
-            if (controller == null || controller.settings == null) return;
-            var copy = Object.Instantiate(controller.settings);
-            string path = AssetDatabase.GenerateUniqueAssetPath(Root + "/Settings/FlightTuning.asset");
-            AssetDatabase.CreateAsset(copy, path); AssetDatabase.SaveAssets();
-            Selection.activeObject = copy;
-            Debug.Log("MANTA: tuning saved to " + path + ". Assign this preset to MantaController outside Play mode to reuse it.");
+            MantaTuningExporter.SaveNewFromMenu();
         }
 
         [MenuItem("Manta/Build or open flight playground")]

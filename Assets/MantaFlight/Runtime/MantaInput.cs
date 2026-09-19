@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace MantaFlight
 {
-    public enum MantaTrick { None, RollLeft, RollRight, LoopForward, LoopBackward, Turnaround }
+    public enum MantaTrick { None, RollLeft, RollRight, LoopForward, LoopBackward, Turnaround, ImpactTurn }
     public struct FlightInput
     {
         public Vector2 steering;
