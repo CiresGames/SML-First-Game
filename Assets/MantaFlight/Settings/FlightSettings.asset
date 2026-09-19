@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 386e18515b8818c48bcd047abf0d93b5, type: 3}
+  m_Name: FlightSettings
+  m_EditorClassIdentifier: 
+  phase: 3
+  minimumSpeed: 12
+  cruiseSpeed: 28
+  maximumSpeed: 64
+  diveMaximumSpeed: 90
+  acceleration: 19
+  deceleration: 30
+  cruiseRelaxation: 2.2
+  accelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.3
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  pitchSpeed: 65
+  yawSpeed: 70
+  pitchLimit: 82
+  turnAcceleration: 7
+  turnDamping: 5
+  momentumResponse: 4.5
+  rollSpeed: 150
+  maximumBanking: 48
+  bankingSmoothing: 5
+  diveAcceleration: 24
+  climbDeceleration: 10
+  tightTurnMultiplier: 2.3
+  tightTurnDrag: 7
+  barrelDuration: 0.85
+  loopDuration: 3.4
+  turnaroundDuration: 1.25
+  turnaroundSpeedRetention: 0.85
+  maneuverCooldown: 0.25
+  environmentMask:
+    serializedVersion: 2
+    m_Bits: 1
+  collisionRadius: 1.4
+  collisionSkin: 0.12
+  minimumFOV: 58
+  maximumFOV: 76
+  cameraDistance: 13
+  speedCameraDistance: 5
+  cameraHeight: 4.2
+  cameraLag: 0.16
+  cameraRotationDamping: 5
+  cameraAnticipation: 0.18
+  cameraBankFraction: 0.12
+  cameraCollisionRadius: 0.45
+  loopCameraPadding: 7
+  loopCameraPullbackTime: 0.22
+  loopCameraReturnTime: 1.1
+  animationIntensity: 1
+  wingAmplitude: 12
+  wingFrequency: 0.65
+  speedEffectsIntensity: 0.65
