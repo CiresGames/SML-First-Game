@@ -78,24 +78,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "LoopForward",
-                    "type": "Button",
-                    "id": "d8baa5c3-332e-4a2b-b777-8082a3f9601b",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "LoopBackward",
-                    "type": "Button",
-                    "id": "817a47c4-d702-4739-9ac0-137f7c0fdbca",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Turnaround",
                     "type": "Button",
                     "id": "1ee2940a-6ea7-4533-a16d-c757ec034442",
@@ -423,50 +405,6 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "RollRight",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f3ce0570-4c03-476a-91d5-ca0668ab50fc",
-                    "path": "<Keyboard>/f",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "LoopForward",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1835d514-ceb4-46f6-a975-b702ba2c5b4f",
-                    "path": "<Gamepad>/buttonWest",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "LoopForward",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "91f80c68-a92b-4e35-bbbd-4f201f0b6cd6",
-                    "path": "<Keyboard>/g",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "LoopBackward",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "669cd9e0-ca26-48e4-ad63-27cff2ce1aef",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "LoopBackward",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

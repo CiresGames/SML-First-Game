@@ -29,14 +29,12 @@ namespace MantaFlight
             clock += dt * s.wingFrequency * Mathf.Lerp(1.2f, .7f, controller.Speed01) * Mathf.PI * 2;
             float wave = Mathf.Sin(clock);
             float breath = wave * .12f * intensity;
-            Vector3 desiredPosition = maneuvers.VisualPositionOffset + new Vector3(0, breath, 0);
-            visualRoot.localPosition = maneuvers.IsLooping ? desiredPosition : Vector3.SmoothDamp(visualRoot.localPosition,
-                desiredPosition, ref visualPositionVelocity, maneuvers.VisualRecoveryTime, Mathf.Infinity, dt);
-            if (maneuvers.IsLooping) visualPositionVelocity = Vector3.zero;
+            visualRoot.localPosition = Vector3.SmoothDamp(visualRoot.localPosition, new Vector3(0, breath, 0),
+                ref visualPositionVelocity, .3f, Mathf.Infinity, dt);
             Quaternion wanted = maneuvers.VisualRotationOffset * Quaternion.Euler(Mathf.Clamp(-controller.Acceleration * .13f, -4, 4) * intensity, 0,
                 controller.Bank + maneuvers.VisualRoll);
-            visualRoot.localRotation = !maneuvers.IsLooping && maneuvers.Current != MantaTrick.RollLeft && maneuvers.Current != MantaTrick.RollRight
-                ? Quaternion.RotateTowards(visualRoot.localRotation, wanted, maneuvers.VisualReturnSpeed * dt) : wanted;
+            visualRoot.localRotation = maneuvers.Current != MantaTrick.RollLeft && maneuvers.Current != MantaTrick.RollRight
+                ? Quaternion.RotateTowards(visualRoot.localRotation, wanted, 160 * dt) : wanted;
             float flap = wave * s.wingAmplitude * Mathf.Lerp(1, .45f, controller.Speed01) * intensity;
             float flex = Mathf.Clamp(controller.Pitch * .1f, -7, 7) * intensity;
             leftWing.localRotation = Quaternion.Euler(0, 0, -flap - flex);

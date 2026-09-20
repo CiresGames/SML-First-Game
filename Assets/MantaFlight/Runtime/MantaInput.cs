@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace MantaFlight
 {
-    public enum MantaTrick { None, RollLeft, RollRight, LoopForward, LoopBackward, Turnaround, ImpactTurn }
+    // Preserve serialized IDs; retired maneuver values remain unassigned.
+    public enum MantaTrick { None = 0, RollLeft = 1, RollRight = 2, Turnaround = 5, ImpactTurn = 6 }
     public struct FlightInput
     {
         public Vector2 steering;
@@ -38,7 +40,7 @@ namespace MantaFlight
             actions = Instantiate(actions);
             if (PlayerPrefs.HasKey(PreferencesKey))
             {
-                try { actions.LoadBindingOverridesFromJson(PlayerPrefs.GetString(PreferencesKey)); }
+                try { LoadSavedBindings(PlayerPrefs.GetString(PreferencesKey)); }
                 catch (Exception) { PlayerPrefs.DeleteKey(PreferencesKey); }
             }
             flight = actions.FindActionMap("Flight", true);
@@ -47,13 +49,26 @@ namespace MantaFlight
             mouse = flight.FindAction("MouseSteering", true);
             mouseEnable = flight.FindAction("MouseEnable", true);
             Hook("RollLeft", MantaTrick.RollLeft); Hook("RollRight", MantaTrick.RollRight);
-            Hook("LoopForward", MantaTrick.LoopForward); Hook("LoopBackward", MantaTrick.LoopBackward);
             Hook("Turnaround", MantaTrick.Turnaround);
             flight["Reset"].performed += _ => { if (!MenuOpen) ResetRequested?.Invoke(); };
             flight["Menu"].performed += _ => { if (rebind == null) SetMenu(!MenuOpen); };
             flight["HUD"].performed += _ => HudRequested?.Invoke();
         }
         void Hook(string name, MantaTrick trick) => flight[name].performed += _ => { if (!MenuOpen) queued = trick; };
+        [Serializable] sealed class SavedOverrides { public List<SavedBinding> bindings; }
+        [Serializable] sealed class SavedBinding { public string action, id, path, interactions, processors; }
+        void LoadSavedBindings(string json)
+        {
+            // Ignore retired bindings without dropping remaps for the remaining controls.
+            var saved = JsonUtility.FromJson<SavedOverrides>(json);
+            if (saved?.bindings == null) return;
+            var currentIds = new HashSet<string>();
+            foreach (var binding in actions.bindings) currentIds.Add(binding.id.ToString());
+            int removed = saved.bindings.RemoveAll(binding => binding == null || !currentIds.Contains(binding.id));
+            string filtered = removed == 0 ? json : JsonUtility.ToJson(saved);
+            actions.LoadBindingOverridesFromJson(filtered);
+            if (removed > 0) { PlayerPrefs.SetString(PreferencesKey, filtered); PlayerPrefs.Save(); }
+        }
         void OnEnable() { if (actions != null) actions.Enable(); }
         void OnDisable()
         {

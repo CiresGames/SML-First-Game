@@ -34,10 +34,6 @@ namespace MantaFlight
         [Min(1)] public float tightTurnMultiplier = 2.3f;
         [Min(0)] public float tightTurnDrag = 7;
         [Min(.2f)] public float barrelDuration = .85f;
-        [HideInInspector] public float loopDuration = 3.4f; // Retained for legacy serialized profiles.
-        [Header("Loopings — shared logic, independent feel")]
-        public MantaLoopSettings forwardLoop = new MantaLoopSettings();
-        public MantaLoopSettings backwardLoop = new MantaLoopSettings { duration = 3, middleSpeedBoost = .25f };
         [Header("Manual turnaround")]
         [Min(.3f)] public float turnaroundDuration = 1.25f;
         [Range(.5f, 1)] public float turnaroundSpeedRetention = .85f;
@@ -63,11 +59,6 @@ namespace MantaFlight
         [Min(0)] public float cameraAnticipation = .18f;
         [Range(0, .5f)] public float cameraBankFraction = .12f;
         [Min(.1f)] public float cameraCollisionRadius = .45f;
-        [Header("Loop camera - close root follow")]
-        public MantaLoopCameraSettings loopCamera = new MantaLoopCameraSettings();
-        [HideInInspector] [Min(1)] public float loopCameraPadding = 7;
-        [HideInInspector] [Min(.01f)] public float loopCameraPullbackTime = .22f;
-        [HideInInspector] [Min(.1f)] public float loopCameraReturnTime = 1.1f;
         [Header("Living creature")]
         [Range(0, 5)] public float animationIntensity = 1;
         [Range(0, 50)] public float wingAmplitude = 12;

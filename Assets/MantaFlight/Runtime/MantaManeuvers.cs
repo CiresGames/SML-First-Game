@@ -7,55 +7,35 @@ namespace MantaFlight
         public MantaTrick Current { get; private set; }
         public float VisualRoll { get; private set; }
         public Quaternion VisualRotationOffset { get; private set; } = Quaternion.identity;
-        public Vector3 VisualPositionOffset { get; private set; }
-        public float VisualReturnSpeed { get; private set; } = 160;
-        public float VisualRecoveryTime { get; private set; } = .3f;
         public float SwerveCameraSignal { get; private set; }
         float swerveSide = 1, proximity;
         Collider avoidanceSurface;
         public float Progress { get; private set; }
-        public bool IsLooping => Current == MantaTrick.LoopForward || Current == MantaTrick.LoopBackward;
         public bool IsImpactTurning => Current == MantaTrick.ImpactTurn;
         public Vector3 EntryPosition { get; private set; }
         public Quaternion EntryHeading => entry;
         public Vector3 EntryVelocity { get; private set; }
         public float EntrySpeed { get; private set; }
         public float Duration => duration;
-        public bool ControlsHeading => IsLooping || IsImpactTurning || Current == MantaTrick.Turnaround;
+        public bool ControlsHeading => IsImpactTurning || Current == MantaTrick.Turnaround;
         public bool LocksSpeed => Current != MantaTrick.None;
         public bool HasTravelOverride { get; private set; }
         public Vector3 TravelDirection { get; private set; }
         public int ImpactCount { get; private set; }
-        public float LoopSteeringMargin => activeLoop == null ? 0 : activeLoop.maximumExitDeviation;
         Quaternion entry, entryVisualOffset;
         float elapsed, duration, cooldown, impactCooldown, turnSign = 1, rotationFraction;
-        float loopMinimumSpeed, loopMaximumSpeed;
         Vector2 steeringOffset;
-        MantaLoopSettings activeLoop;
         MantaImpactSettings activeImpact;
         Vector3 impactNormal, impactDesiredExit, impactExit;
 
         public bool TryStart(MantaTrick trick, MantaController controller, float steering = 0)
         {
             if (!controller.settings.Has(FlightPhase.AdvancedManeuvers) || Current != MantaTrick.None || cooldown > 0
-                || trick == MantaTrick.None || trick == MantaTrick.ImpactTurn) return false;
+                || (trick != MantaTrick.RollLeft && trick != MantaTrick.RollRight && trick != MantaTrick.Turnaround)) return false;
             Begin(trick, controller);
             turnSign = steering < -.1f ? -1 : 1;
             var s = controller.settings;
-            if (IsLooping)
-            {
-                // Snapshot one figure's feel: editing the profile mid-figure applies on the next trigger.
-                activeLoop = JsonUtility.FromJson<MantaLoopSettings>(JsonUtility.ToJson(trick == MantaTrick.LoopForward ? s.forwardLoop : s.backwardLoop));
-                duration = activeLoop.ResolveDuration(EntrySpeed);
-                loopMinimumSpeed = s.minimumSpeed; loopMaximumSpeed = s.diveMaximumSpeed;
-                if (EntryVelocity.sqrMagnitude > .01f)
-                    entry = Quaternion.FromToRotation(entry * Vector3.forward, EntryVelocity.normalized) * entry;
-                entryVisualOffset = Quaternion.Inverse(entry) * controller.Heading;
-                VisualRotationOffset = entryVisualOffset;
-                VisualRecoveryTime = Mathf.Max(.01f, activeLoop.visualRecoveryTime);
-                VisualReturnSpeed = activeLoop.releaseUprightSpeed;
-            }
-            else duration = trick == MantaTrick.Turnaround ? s.turnaroundDuration : s.barrelDuration;
+            duration = trick == MantaTrick.Turnaround ? s.turnaroundDuration : s.barrelDuration;
             return true;
         }
         void Begin(MantaTrick trick, MantaController controller)
@@ -63,7 +43,7 @@ namespace MantaFlight
             Current = trick; elapsed = Progress = rotationFraction = 0; steeringOffset = Vector2.zero;
             entry = controller.Heading; EntryPosition = controller.GetComponent<Rigidbody>().position;
             EntryVelocity = controller.Velocity; EntrySpeed = controller.Speed;
-            VisualRoll = 0; VisualPositionOffset = Vector3.zero; VisualRotationOffset = Quaternion.identity; HasTravelOverride = false;
+            VisualRoll = 0; VisualRotationOffset = Quaternion.identity; HasTravelOverride = false;
         }
         public void ProbeObstacles(MantaController controller)
         {
@@ -152,7 +132,6 @@ namespace MantaFlight
             }
             float oldProgress = Progress;
             elapsed += dt; Progress = Mathf.Clamp01(elapsed / Mathf.Max(.1f, duration));
-            if (IsLooping) { StepLoop(controller, input, dt); return; }
             if (IsImpactTurning) { StepImpact(controller, input, dt); return; }
             float t = Mathf.SmoothStep(0, 1, Progress);
             switch (Current)
@@ -167,36 +146,6 @@ namespace MantaFlight
             }
             if (Progress >= 1) Finish(controller, controller.settings.rollSpeed);
         }
-        void StepLoop(MantaController controller, FlightInput input, float dt)
-        {
-            if (elapsed >= activeLoop.inputLockTime && activeLoop.brakeCanCancel && input.brake >= activeLoop.brakeCancelThreshold)
-            { Finish(controller, activeLoop.releaseUprightSpeed); return; }
-            if (elapsed >= activeLoop.inputLockTime)
-            {
-                float influence = activeLoop.steeringInfluence * Mathf.Clamp01(activeLoop.steeringCurve == null ? 1 : activeLoop.steeringCurve.Evaluate(Progress));
-                steeringOffset += input.steering * (influence * activeLoop.steeringDegreesPerSecond * dt);
-                steeringOffset = Vector2.ClampMagnitude(steeringOffset, activeLoop.maximumExitDeviation);
-            }
-            Quaternion nominal = EvaluateLoopHeading(Progress, ref rotationFraction);
-            Quaternion correction = Quaternion.AngleAxis(steeringOffset.x, Vector3.up)
-                * Quaternion.AngleAxis(-steeringOffset.y, entry * Vector3.right);
-            controller.SetHeading(correction * entry);
-            controller.SetSpeed(EvaluateLoopSpeed(Progress));
-            TravelDirection = controller.Heading * Vector3.forward; HasTravelOverride = true;
-            float alignment = activeLoop.inputLockTime <= 0 ? 1 : Mathf.SmoothStep(0, 1, elapsed / activeLoop.inputLockTime);
-            VisualRotationOffset = Quaternion.Inverse(entry) * nominal * Quaternion.Slerp(entryVisualOffset, Quaternion.identity, alignment);
-            float angle = rotationFraction * Mathf.PI * 2;
-            float sign = Current == MantaTrick.LoopForward ? -1 : 1;
-            VisualPositionOffset = new Vector3(0, sign * activeLoop.visualRadius * (1 - Mathf.Cos(angle)), activeLoop.visualRadius * Mathf.Sin(angle));
-            if (Progress >= 1) Finish(controller, activeLoop.releaseUprightSpeed);
-        }
-        public Quaternion EvaluateLoopHeading(float progress, ref float previousFraction)
-        {
-            previousFraction = Mathf.Max(previousFraction, activeLoop.RotationFraction(progress));
-            float sign = Current == MantaTrick.LoopForward ? 1 : -1;
-            return entry * Quaternion.AngleAxis(sign * 360 * previousFraction, Vector3.right);
-        }
-        public float EvaluateLoopSpeed(float progress) => Mathf.Clamp(EntrySpeed * activeLoop.SpeedFactor(progress), loopMinimumSpeed, loopMaximumSpeed);
         void StepImpact(MantaController controller, FlightInput input, float dt)
         {
             bool released = elapsed >= activeImpact.inputLockTime;
@@ -232,14 +181,14 @@ namespace MantaFlight
         void Finish(MantaController controller, float uprightSpeed)
         {
             bool controlledHeading = ControlsHeading;
-            Current = MantaTrick.None; VisualRoll = 0; VisualPositionOffset = Vector3.zero; VisualRotationOffset = Quaternion.identity;
+            Current = MantaTrick.None; VisualRoll = 0; VisualRotationOffset = Quaternion.identity;
             cooldown = controller.settings.maneuverCooldown;
             if (controlledHeading) controller.BeginManeuverRelease(uprightSpeed);
         }
         public void Cancel()
         {
             Current = MantaTrick.None; VisualRoll = elapsed = Progress = cooldown = 0;
-            VisualPositionOffset = Vector3.zero; VisualRotationOffset = Quaternion.identity; HasTravelOverride = false;
+            VisualRotationOffset = Quaternion.identity; HasTravelOverride = false;
         }
         public void ResetState() { Cancel(); impactCooldown = 0; ImpactCount = 0; SwerveCameraSignal = 0; avoidanceSurface = null; }
     }

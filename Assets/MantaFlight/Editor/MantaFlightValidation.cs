@@ -83,7 +83,7 @@ namespace MantaFlight.Editor
                 if (phase >= FlightPhase.AdvancedManeuvers)
                 {
                     var tricks = manta.GetComponent<MantaManeuvers>();
-                    foreach (MantaTrick trick in new[] { MantaTrick.RollLeft, MantaTrick.RollRight, MantaTrick.LoopForward, MantaTrick.LoopBackward, MantaTrick.Turnaround })
+                    foreach (MantaTrick trick in new[] { MantaTrick.RollLeft, MantaTrick.RollRight, MantaTrick.Turnaround })
                     {
                         AtAltitude(); Vector3 start = manta.GetComponent<Rigidbody>().position; float initialSpeed = manta.Speed;
                         Check(tricks.TryStart(trick, manta), trick + " starts");
@@ -165,7 +165,7 @@ namespace MantaFlight.Editor
                 manta.ScaleSpeed(2.5f); camera.Snap(); camera.SendMessage("LateUpdate");
                 Check(lens.fieldOfView > cruiseFOV + 5 && lens.fieldOfView <= manta.settings.maximumFOV + 4.1f, "FOV increases with speed and stays bounded");
                 var tricks = manta.GetComponent<MantaManeuvers>();
-                foreach (var trick in new[] { MantaTrick.RollRight, MantaTrick.LoopBackward, MantaTrick.Turnaround })
+                foreach (var trick in new[] { MantaTrick.RollRight, MantaTrick.Turnaround })
                 {
                     AtAltitude(); tricks.TryStart(trick, manta); camera.Snap();
                     float leastUp = 1;

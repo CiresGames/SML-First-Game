@@ -94,8 +94,6 @@ namespace MantaFlight.Editor
             Add(map, "Brake", "<Keyboard>/c", "<Gamepad>/leftTrigger", true);
             Add(map, "RollLeft", "<Keyboard>/q", "<Gamepad>/leftShoulder");
             Add(map, "RollRight", "<Keyboard>/e", "<Gamepad>/rightShoulder");
-            Add(map, "LoopForward", "<Keyboard>/f", "<Gamepad>/buttonWest");
-            Add(map, "LoopBackward", "<Keyboard>/g", "<Gamepad>/buttonNorth");
             Add(map, "Turnaround", "<Keyboard>/x", "<Gamepad>/buttonEast");
             Add(map, "TightTurn", "<Keyboard>/leftAlt", "<Gamepad>/buttonSouth");
             Add(map, "Dive", "<Keyboard>/v", "<Gamepad>/rightStickPress", true);
