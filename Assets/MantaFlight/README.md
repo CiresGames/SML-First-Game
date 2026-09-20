@@ -83,3 +83,8 @@ En Play mode : **Manta → Validate current flight phase (Play mode)**. Les essa
 Vérifications couvertes : accélération/freinage, limites de pitch, banking, comparaison 50/100 Hz, collision contre une paroi de 15 cm, énergie plongeon/remontée, les trois figures, virage serré, sticks/gâchettes virtuels, zones mortes, persistance des liaisons, reset, FOV, horizon pendant les figures, collision caméra et annulation du remappage.
 
 Les essais automatisés et les captures vérifient la stabilité et la lisibilité ; ils ne remplacent pas un essai humain du game feel avec une souris et une manette physique. Aucun build distribué n’a été produit. Le package officiel `com.unity.pipeline` permet les vérifications dans l’éditeur ; le vol lui-même ne dépend pas de ses commandes.
+
+
+## Rider au sol et wingsuit
+
+Le personnage, les commandes de descente/saut, le wingsuit et la récupération par la manta sont décrits dans [Rider/README.md](Rider/README.md). Les réglages du rider sont séparés du profil de vol de la manta.

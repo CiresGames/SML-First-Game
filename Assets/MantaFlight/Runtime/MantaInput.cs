@@ -22,6 +22,7 @@ namespace MantaFlight
         [Range(.5f, 3)] public float sensitivityExponent = 1.4f;
         [Range(.001f, .2f)] public float mouseSensitivity = .035f;
         public bool invertPitch;
+        public bool ControlEnabled { get; set; } = true;
         public FlightInput State { get; private set; }
         public bool MenuOpen { get; private set; }
         public string RebindingLabel { get; private set; }
@@ -54,7 +55,7 @@ namespace MantaFlight
             flight["Menu"].performed += _ => { if (rebind == null) SetMenu(!MenuOpen); };
             flight["HUD"].performed += _ => HudRequested?.Invoke();
         }
-        void Hook(string name, MantaTrick trick) => flight[name].performed += _ => { if (!MenuOpen) queued = trick; };
+        void Hook(string name, MantaTrick trick) => flight[name].performed += _ => { if (!MenuOpen && ControlEnabled) queued = trick; };
         [Serializable] sealed class SavedOverrides { public List<SavedBinding> bindings; }
         [Serializable] sealed class SavedBinding { public string action, id, path, interactions, processors; }
         void LoadSavedBindings(string json)
@@ -78,7 +79,7 @@ namespace MantaFlight
         void OnDestroy() { rebind?.Dispose(); if (actions != null) Destroy(actions); }
         void Update()
         {
-            if (MenuOpen) { State = default; return; }
+            if (MenuOpen || !ControlEnabled) { State = default; queued = MantaTrick.None; return; }
             Vector2 value = steer.ReadValue<Vector2>();
             if (steer.activeControl == null || steer.activeControl.device is Gamepad)
             {

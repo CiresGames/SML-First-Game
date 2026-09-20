@@ -128,6 +128,13 @@ namespace MantaFlight
             }
             body.MovePosition(position);
         }
+        public void SetExternalMotion(Vector3 position, Quaternion rotation, Vector3 velocity)
+        {
+            body.position = position; body.rotation = rotation;
+            transform.SetPositionAndRotation(position, rotation);
+            Heading = rotation; Velocity = velocity; Speed = velocity.magnitude; SyncAngles();
+            yawRate = pitchRate = Bank = 0; recoveringOrientation = false;
+        }
         public void SetHeading(Quaternion value) { Heading = value; SyncAngles(); }
         void SyncAngles()
         {

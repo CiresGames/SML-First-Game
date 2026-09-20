@@ -42,6 +42,7 @@ MonoBehaviour:
     - Lofelt.NiceVibrations
     - Lofelt.NiceVibrations.Demo
     - MoreMountains.Tools
+    - Unity.StarterAssets
     - VInspector
     showAdvancedSettings: 0
   addMgrToSceneAutomatically: 0

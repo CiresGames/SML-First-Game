@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f97bb9b35bd047540aeb4bff7e468ccb, type: 3}
+  m_Name: RiderFeel
+  m_EditorClassIdentifier: 
+  ground:
+    walkSpeed: 3.2
+    runSpeed: 6.5
+    crouchSpeed: 1.7
+    acceleration: 14
+    deceleration: 20
+    turnRate: 210
+    gravity: 27
+    jumpHeight: 1.15
+    airAcceleration: 3
+    terminalSpeed: 65
+    standingHeight: 1.8
+    crouchHeight: 1.05
+    radius: 0.28
+    groundProbe: 0.12
+    rollDuration: 0.65
+    rollDistance: 4.5
+    rollCooldown: 0.7
+    landingRecovery: 0.18
+    hardLandingRecovery: 0.65
+    forcedRollImpact: 12
+    forcedRollSpeed: 15
+    hardLandingImpact: 28
+    gentleLandingAngle: 40
+    landingShake: 0.1
+  glide:
+    gravity: 9
+    liftCoefficient: 0.075
+    baseDrag: 0.012
+    inducedDrag: 0.016
+    trimAngle: 9
+    stallAngle: 35
+    stallSpeed: 9
+    recoverSpeed: 13
+    maximumSpeed: 65
+    targetGlideRatio: 3.2
+    minimumSink: 1.2
+    diveAcceleration: 5
+    pitchRate: 65
+    bankRate: 95
+    yawRate: 42
+    pitchLimit: 78
+    bankLimit: 65
+    inputSmoothing: 4
+    stallRecoveryTime: 0.3
+    stallLiftFraction: 0.08
+    minimumDeployHeight: 5
+    minimumAirTime: 0.35
+    minimumDownSpeed: 3
+    deployDuration: 0.4
+    retractDuration: 0.25
+    windVolume: 0.12
+    windMinPitch: 0.65
+    windMaxPitch: 1.6
+  camera:
+    groundDistance: 5
+    groundHeight: 1.4
+    fallDistance: 6
+    glideDistance: 6
+    speedPullback: 5
+    lag: 0.13
+    rotationDamping: 6
+    minFOV: 60
+    maxFOV: 80
+    blendDuration: 0.45
+    bankFraction: 0.14
+    maximumRoll: 8
+    lookLimit: 7
+    lookRecenter: 4
+    verticalFallbackStart: 0.82
+    verticalFallbackEnd: 0.97
+    lowSpeedFallback: 5
+    collisionRadius: 0.25
+    landingPulseDuration: 0.25
+    landingPulseFrequency: 28
+  mount:
+    dismountHeight: 4
+    dismountSpeed: 2
+    sideDistance: 3
+    dismountDuration: 0.45
+    hoverBrakeThreshold: 0.8
+    hoverDeceleration: 18
+    hoverEntrySpeed: 16
+    jumpUpSpeed: 7
+    jumpForwardSpeed: 6
+    velocityInheritance: 0.85
+    blendDuration: 0.3
+    scoopRadius: 2.4
+    maximumRelativeSpeed: 7
+    gracePeriod: 1
+    predictionTime: 0.6
+    approachBehind: 10
+    approachBelow: 2
+    matchDistance: 16
+    callSpeed: 55
+    callAcceleration: 35
+    callTurnRate: 140
+    callTimeout: 16
+    passTimeout: 5
+    retryDuration: 1.2
+    maximumCallDistance: 600
+    landedMountDistance: 4
+    landingOffset: 5
+    hoverHeight: 2.2
+  environment:
+    serializedVersion: 2
+    m_Bits: 1
+  secondJumpDeploys: 0
+  inputDeadZone: 0.12
+  inputExponent: 1.35
+  mouseLookSensitivity: 0.08
+  stickLookSensitivity: 100
+  resetBelowHeight: -70
