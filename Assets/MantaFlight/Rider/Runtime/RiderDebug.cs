@@ -13,11 +13,11 @@ namespace MantaFlight.Rider
             var c=canvas.GetComponent<Canvas>();c.renderMode=RenderMode.ScreenSpaceOverlay;c.sortingOrder=15;
             var scaler=canvas.GetComponent<UnityEngine.UI.CanvasScaler>();scaler.uiScaleMode=UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;scaler.referenceResolution=new Vector2(1920,1080);
             var panel=new GameObject("Rider status",typeof(RectTransform),typeof(UnityEngine.UI.Image));panel.transform.SetParent(canvas.transform,false);
-            var rect=panel.GetComponent<RectTransform>();rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(1,1);rect.anchoredPosition=new Vector2(-20,-20);rect.sizeDelta=new Vector2(470,250);
+            var rect=panel.GetComponent<RectTransform>();rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(1,1);rect.anchoredPosition=new Vector2(-20,-20);rect.sizeDelta=new Vector2(470,280);
             panel.GetComponent<UnityEngine.UI.Image>().color=new Color(.025f,.07f,.10f,.88f);
-            text=Label(panel.transform,new Vector2(12,-10),new Vector2(446,178),17);
+            text=Label(panel.transform,new Vector2(12,-10),new Vector2(446,218),17);
             var button=new GameObject("Invert wingsuit pitch",typeof(RectTransform),typeof(UnityEngine.UI.Image),typeof(UnityEngine.UI.Button));button.transform.SetParent(panel.transform,false);
-            var br=button.GetComponent<RectTransform>();br.anchorMin=br.anchorMax=br.pivot=new Vector2(0,1);br.anchoredPosition=new Vector2(12,-196);br.sizeDelta=new Vector2(446,40);
+            var br=button.GetComponent<RectTransform>();br.anchorMin=br.anchorMax=br.pivot=new Vector2(0,1);br.anchoredPosition=new Vector2(12,-236);br.sizeDelta=new Vector2(446,40);
             button.GetComponent<UnityEngine.UI.Image>().color=new Color(.12f,.3f,.35f);
             button.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(()=>rider.Input.UserSettings.SetInvertPitch(!rider.Input.UserSettings.InvertPitch));
             buttonText=Label(button.transform,new Vector2(8,-8),new Vector2(430,30),17);
@@ -31,7 +31,7 @@ namespace MantaFlight.Rider
         void Update()
         {
             if(text==null)return;
-            text.text=$"RIDER  {rider.State}   |   MANTA {rider.mount.Mode}\nSpeed {rider.Motor.Velocity.magnitude:0.0} m/s   Height {rider.Height:0.0} m\nGlide available: {rider.GlideAvailable}   Air {rider.AirTime:0.00}s\nStall {rider.Glide.Stalled}   AoA {rider.Glide.AngleOfAttack:0} deg\nDismount {rider.mount.CanDismount(out _)}   Scoop {rider.CanScoop}\nF: mount/step off  J: jump off  K: drop\nSpace: jump  G: glide  Q: roll  H: call/cancel";
+            text.text=$"RIDER  {rider.State}   |   MANTA {rider.mount.Mode}\nSpeed {rider.Motor.Velocity.magnitude:0.0} m/s   Height {rider.Height:0.0} m\nGlide available: {rider.GlideAvailable}   Air {rider.AirTime:0.00}s\nStall {rider.Glide.Stalled}   AoA {rider.Glide.AngleOfAttack:0} deg\nDismount {rider.mount.CanDismount(out _)}   Scoop {rider.CanScoop}\nF: mount/jump off  J/K: jump off\nSpace: jump  G: glide  Q: roll  H: call/cancel (air)\n{rider.LandingTarget.Feedback}";
             buttonText.text="Wingsuit pitch inverted: "+rider.Input.UserSettings.InvertPitch+"   [I]";
         }
         void OnDestroy(){if(canvas!=null)Destroy(canvas);}

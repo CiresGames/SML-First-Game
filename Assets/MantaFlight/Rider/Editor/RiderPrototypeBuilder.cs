@@ -28,7 +28,7 @@ namespace MantaFlight.Rider.Editor
             Add(map,"Roll","<Keyboard>/q","<Gamepad>/buttonEast");
             Add(map,"Context","<Keyboard>/f","<Gamepad>/buttonWest");
             Add(map,"Glide","<Keyboard>/g","<Gamepad>/buttonNorth");
-            Add(map,"JumpOff","<Keyboard>/j","<Gamepad>/buttonNorth");
+            Add(map,"JumpOff","<Keyboard>/j","<Gamepad>/dpad/left");
             Add(map,"Drop","<Keyboard>/k","<Gamepad>/dpad/down");
             Add(map,"Call","<Keyboard>/h","<Gamepad>/dpad/up");
             Add(map,"InvertPitch","<Keyboard>/i","<Gamepad>/dpad/right");

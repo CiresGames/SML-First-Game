@@ -349,7 +349,7 @@
                 {
                     "name": "",
                     "id": "50626225-11dc-4188-8331-397b037bb255",
-                    "path": "<Gamepad>/buttonNorth",
+                    "path": "<Gamepad>/dpad/left",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

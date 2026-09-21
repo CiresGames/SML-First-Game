@@ -34,7 +34,7 @@ namespace MantaFlight.Rider
             }
             Vector3 velocity=rider.Motor.Velocity;
             float speed=velocity.magnitude, speed01=Mathf.InverseLerp(rider.settings.glide.stallSpeed,rider.settings.glide.maximumSpeed,speed);
-            bool gliding=rider.State==RiderState.Glide || rider.State==RiderState.Deploying || rider.State==RiderState.JumpOff;
+            bool gliding=rider.State==RiderState.Glide || rider.State==RiderState.Deploying;
             Vector2 look=rider.LookInput;
             Quaternion rotation;
             if(gliding)

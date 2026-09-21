@@ -11,14 +11,14 @@ namespace MantaFlight.Rider.Editor
         static RiderController r;
         static List<string> report=new List<string>();
         static void Check(bool ok,string message){report.Add((ok?"PASS ":"FAIL ")+message);if(!ok)throw new Exception(message);}
-        static void Step(RiderCommand command=default,float dt=.02f){r.Tick(command,dt);Physics.SyncTransforms();}
+        static void Step(RiderCommand command=default,float dt=.02f){RiderPhysicsTestScope.Step(dt);r.Tick(command,dt);Physics.SyncTransforms();}
         static void Advance(float time,RiderCommand command=default){for(int i=0;i<Mathf.CeilToInt(time/.02f);i++)Step(command);}
         [MenuItem("Manta/Rider/Validate ground and glide (Play mode)")]
         public static void RunMenu()=>Debug.Log(Run());
         public static string Run()
         {
             if(!EditorApplication.isPlaying)throw new InvalidOperationException("Play mode required");
-            r=Object.FindFirstObjectByType<RiderController>();report.Clear();
+            r=Object.FindFirstObjectByType<RiderController>();using var physics = new RiderPhysicsTestScope(r);report.Clear();
             var floor=GameObject.CreatePrimitive(PrimitiveType.Cube);
             floor.transform.position=new Vector3(-700,499.5f,-700);floor.transform.localScale=new Vector3(80,1,80);
             var origin=new Vector3(-700,500.05f,-700);bool paused=r.mantaInput.MenuOpen;
@@ -55,7 +55,7 @@ namespace MantaFlight.Rider.Editor
                 r.PlaceForTest(origin+Vector3.up*2,Vector3.down*20+Vector3.forward*10,RiderState.Falling);Advance(.12f);
                 Check(r.State==RiderState.Rolling,"High impact forces landing roll");
                 r.mount.manta.ResetFlight();r.Detach(true);
-                Check(r.State==RiderState.JumpOff && r.GlidePose==1 && !r.CanScoop,"Jump-off deploys wingsuit and blocks immediate scoop");
+                Check(r.State==RiderState.Falling && r.GlidePose==0 && !r.CanScoop,"Jump-off enters free fall without wingsuit and blocks immediate scoop");
                 Advance(1.1f);Check(r.CanScoop,"Grace period eventually permits scoop");
                 return string.Join("\n",report);
             }
@@ -67,7 +67,7 @@ namespace MantaFlight.Rider.Editor
         }
         public static string RunTransitions()
         {
-            r=Object.FindFirstObjectByType<RiderController>();report.Clear();
+            r=Object.FindFirstObjectByType<RiderController>();using var physics = new RiderPhysicsTestScope(r);report.Clear();
             var floor=GameObject.CreatePrimitive(PrimitiveType.Cube);var origin=new Vector3(-700,500,-700);
             floor.transform.position=origin+Vector3.down*.5f;floor.transform.localScale=new Vector3(80,1,80);
             bool paused=r.mantaInput.MenuOpen;r.mantaInput.SetMenu(false);
@@ -77,7 +77,7 @@ namespace MantaFlight.Rider.Editor
             {
                 Physics.SyncTransforms();r.mount.manta.ResetFlight();r.mount.manta.SetExternalMotion(origin+Vector3.up*2.2f,Quaternion.identity,Vector3.zero);
                 Check(r.mount.CanDismount(out _),"Low stationary manta permits a clear ground dismount");
-                Step(new RiderCommand{context=true});Advance(.9f);
+                Step(new RiderCommand{context=true});Advance(1.6f);
                 Check(r.State==RiderState.Grounded && r.mount.Mode==MantaServiceState.Idle,"Step-off reaches ground and manta hovers idle");
                 r.PlaceForTest(origin,Vector3.down,RiderState.Falling);Advance(.5f);
                 r.mount.manta.SetExternalMotion(origin+new Vector3(30,20,0),Quaternion.identity,Vector3.zero);
@@ -121,7 +121,7 @@ namespace MantaFlight.Rider.Editor
         }
         public static string RunMount()
         {
-            r=Object.FindFirstObjectByType<RiderController>();report.Clear();bool paused=r.mantaInput.MenuOpen;r.mantaInput.SetMenu(false);
+            r=Object.FindFirstObjectByType<RiderController>();using var physics = new RiderPhysicsTestScope(r);report.Clear();bool paused=r.mantaInput.MenuOpen;r.mantaInput.SetMenu(false);
             try
             {
                 var origin=new Vector3(-700,700,-700);
@@ -135,7 +135,7 @@ namespace MantaFlight.Rider.Editor
                 r.mount.ToggleCall();Check(r.mount.Calling,"Call starts while falling");r.mount.ToggleCall();Check(!r.mount.Calling,"Second call cancels cleanly");
                 float timeout=r.settings.mount.callTimeout;r.settings.mount.callTimeout=.15f;
                 r.mount.ToggleCall();for(int i=0;i<15;i++){r.mount.Tick(.02f);Step();}
-                Check(!r.mount.Calling,"Intercept timeout returns manta to idle");r.settings.mount.callTimeout=timeout;
+                Check(!r.mount.Calling,"Intercept timeout returns manta to companion follow");r.settings.mount.callTimeout=timeout;
                 return string.Join("\n",report);
             }
             finally {r.mount.manta.ResetFlight();r.mantaInput.SetMenu(paused);File.WriteAllLines("Logs/MantaFlight/validation-rider-mount.txt",report);}

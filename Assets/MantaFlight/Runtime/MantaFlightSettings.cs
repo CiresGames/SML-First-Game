@@ -24,7 +24,7 @@ namespace MantaFlight
         [Range(10, 89)] public float pitchLimit = 82;
         [Min(.1f)] public float turnAcceleration = 7;
         [Min(.1f)] public float turnDamping = 5;
-        [Min(.1f)] public float momentumResponse = 4.5f;
+        [Min(.1f)] public float     momentumResponse = 4.5f;
         [Min(1)] public float rollSpeed = 150;
         [Range(0, 85)] public float maximumBanking = 48;
         [Min(.1f)] public float bankingSmoothing = 5;

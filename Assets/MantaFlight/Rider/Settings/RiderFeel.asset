@@ -38,23 +38,25 @@ MonoBehaviour:
     gentleLandingAngle: 40
     landingShake: 0.1
   glide:
-    gravity: 9
-    liftCoefficient: 0.075
+    gravity: 18
+    liftCoefficient: 0.1
     baseDrag: 0.012
     inducedDrag: 0.016
     trimAngle: 9
-    stallAngle: 35
+    stallAngle: 80
     stallSpeed: 9
     recoverSpeed: 13
-    maximumSpeed: 65
+    maximumSpeed: 42
     targetGlideRatio: 3.2
     minimumSink: 1.2
     diveAcceleration: 5
-    pitchRate: 65
-    bankRate: 95
-    yawRate: 42
-    pitchLimit: 78
-    bankLimit: 65
+    pitchRate: 90
+    bankRate: 20
+    yawRate: 70
+    pitchLimit: 45
+    bankLimit: 20
+    neutralTrimResponse: 3
+    stallHysteresis: 5
     inputSmoothing: 4
     stallRecoveryTime: 0.3
     stallLiftFraction: 0.08
@@ -74,8 +76,8 @@ MonoBehaviour:
     speedPullback: 5
     lag: 0.13
     rotationDamping: 6
-    minFOV: 60
-    maxFOV: 80
+    minFOV: 40
+    maxFOV: 60
     blendDuration: 0.45
     bankFraction: 0.14
     maximumRoll: 8
@@ -95,20 +97,25 @@ MonoBehaviour:
     hoverBrakeThreshold: 0.8
     hoverDeceleration: 18
     hoverEntrySpeed: 16
-    jumpUpSpeed: 7
-    jumpForwardSpeed: 6
-    velocityInheritance: 0.85
+    jumpUpSpeed: 3
+    jumpForwardSpeed: 8
+    velocityInheritance: 0.7
+    jumpCollisionIgnoreDuration: 0.35
+    jumpSeparationClearance: 0.15
+    jumpProbeDistance: 3
+    jumpStartClearance: 0.08
     blendDuration: 0.3
-    scoopRadius: 2.4
-    maximumRelativeSpeed: 7
+    scoopRadius: 4
+    maximumRelativeSpeed: 16
     gracePeriod: 1
-    predictionTime: 0.6
+    predictionTime: 1.2
     approachBehind: 10
     approachBelow: 2
-    matchDistance: 16
-    callSpeed: 55
-    callAcceleration: 35
-    callTurnRate: 140
+    matchDistance: 22
+    callSpeed: 30
+    callAcceleration: 25
+    callTurnRate: 40
+    approachResponse: 2.5
     callTimeout: 16
     passTimeout: 5
     retryDuration: 1.2
@@ -116,6 +123,17 @@ MonoBehaviour:
     landedMountDistance: 4
     landingOffset: 5
     hoverHeight: 2.2
+    followDistance: 16
+    followHeight: 6
+    followResponse: 1.8
+    followTargetSmoothing: 0.08
+    followSway: 1.2
+    followSwayPeriod: 5
+    maximumLandingSlope: 40
+    landingAimRange: 70
+    landingProbeHeight: 25
+    landingIndicatorRadius: 1.5
+    landingTolerance: 0.7
   environment:
     serializedVersion: 2
     m_Bits: 1

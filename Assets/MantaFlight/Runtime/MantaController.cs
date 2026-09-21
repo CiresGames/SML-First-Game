@@ -128,6 +128,21 @@ namespace MantaFlight
             }
             body.MovePosition(position);
         }
+        public Vector3 PhysicsPosition => body.position;
+        public Quaternion PhysicsRotation => body.rotation;
+        // Autonomous locomotion submits one kinematic pose per fixed step. Never overwrite the
+        // interpolated Transform here: doing so destroys Unity's between-frame interpolation.
+        public void MoveExternalMotion(Vector3 position, Quaternion rotation, Vector3 velocity)
+        {
+            UpdateExternalVelocity(rotation, velocity);
+            body.MovePosition(position); body.MoveRotation(rotation);
+        }
+        public void UpdateExternalVelocity(Quaternion rotation, Vector3 velocity)
+        {
+            Heading = rotation; Velocity = velocity; Speed = velocity.magnitude; SyncAngles();
+            yawRate = pitchRate = Bank = 0; recoveringOrientation = false;
+        }
+        // Explicit teleport for respawn/editor setup only; normal service movement uses MoveExternalMotion.
         public void SetExternalMotion(Vector3 position, Quaternion rotation, Vector3 velocity)
         {
             body.position = position; body.rotation = rotation;

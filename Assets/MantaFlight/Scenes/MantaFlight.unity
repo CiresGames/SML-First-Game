@@ -29245,6 +29245,60 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930362234}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1933893908
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1933893909}
+  - component: {fileID: 1933893910}
+  m_Layer: 2
+  m_Name: Manta collision shell
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1933893909
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933893908}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5783658662179433426}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &1933893910
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933893908}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: 14527d9234522f74690753b81f191bd3, type: 2}
 --- !u!1 &1936681844
 GameObject:
   m_ObjectHideFlags: 0
@@ -34505,6 +34559,18 @@ PrefabInstance:
       propertyPath: settings
       value: 
       objectReference: {fileID: 11400000, guid: e246876735759f343948397857e87db4, type: 2}
+    - target: {fileID: 5295711932395451541, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5295711932395451541, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5295711932395451541, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5349899912234267986, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
       propertyPath: stickDeadZone
       value: 0.528
@@ -34520,6 +34586,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2872257832435642061, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1933893909}
     - targetCorrespondingSourceObject: {fileID: 5781626546854967541, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1527185968}
@@ -34565,6 +34634,11 @@ MonoBehaviour:
   manta: {fileID: 5783658662179433419}
   seat: {fileID: 1527185968}
   rider: {fileID: 2051761752}
+--- !u!4 &5783658662179433426 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2872257832435642061, guid: 2a0cc920ca3038143873893cf7bed062, type: 3}
+  m_PrefabInstance: {fileID: 5783658662179433418}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5784297027443664539
 GameObject:
   m_ObjectHideFlags: 0
