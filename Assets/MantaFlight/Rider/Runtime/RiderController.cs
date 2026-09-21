@@ -24,6 +24,7 @@ namespace MantaFlight.Rider
         public float AirTime { get; private set; }
         public float SinceDetach { get; private set; }
         public float StateTime { get; private set; }
+        public float LandingDuration => landingDuration;
         public float Height => Motor.HeightAboveGround();
         public float GlidePose { get; private set; }
         public float LandingPulse { get; private set; }

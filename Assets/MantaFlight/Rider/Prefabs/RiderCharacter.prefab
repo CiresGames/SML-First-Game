@@ -555,6 +555,8 @@ MonoBehaviour:
   model: {fileID: 1946971201213583905}
   animator: {fileID: 1819634867187780018}
   landingClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
+  landingAnimation: {fileID: -203655887218126122, guid: 31fd6f542ab1ca74bb43d7fc43a59783, type: 3}
+  rollingAnimation: {fileID: -203655887218126122, guid: c39d74f0116a3394097ffd24733850b5, type: 3}
 --- !u!114 &7042179144897850576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2148,7 +2150,7 @@ Animator:
   m_GameObject: {fileID: 6559155761057647819}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
-  m_Controller: {fileID: 9100000, guid: 40db3173a05ae3242b1c182a09b0a183, type: 2}
+  m_Controller: {fileID: 9100000, guid: 739abf3c3124bf44bbfb38c6a5412933, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

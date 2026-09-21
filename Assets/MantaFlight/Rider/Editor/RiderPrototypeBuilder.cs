@@ -48,6 +48,8 @@ namespace MantaFlight.Rider.Editor
             foreach(var t in model.GetComponentsInChildren<Transform>(true))t.gameObject.layer=2;
             var animator=model.GetComponent<Animator>();animator.applyRootMotion=false;model.AddComponent<RiderAnimationEvents>();
             var visuals=root.AddComponent<RiderVisuals>();visuals.rider=controller;visuals.model=model.transform;visuals.animator=animator;
+            var riderAnimator=AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(RiderAnimationSetup.ControllerPath);
+            if(riderAnimator!=null)RiderAnimationSetup.Configure(visuals,riderAnimator);
             visuals.landingClip=AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Starter Assets/Runtime/ThirdPersonController/Character/Sfx/Player_Land.wav");
             root.AddComponent<RiderDebug>().rider=controller;
             PrefabUtility.SaveAsPrefabAsset(root,Root+"/Prefabs/RiderCharacter.prefab");
