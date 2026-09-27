@@ -56,7 +56,7 @@ MonoBehaviour:
   diveAcceleration: 24
   climbDeceleration: 10
   tightTurnMultiplier: 2.3
-  tightTurnDrag: 7
+  tightTurnDrag: 10
   barrelDuration: 0.85
   turnaroundDuration: 1.25
   turnaroundSpeedRetention: 0.85

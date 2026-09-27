@@ -59,3 +59,33 @@ Controlled 1280 × 720 frozen-camera comparison, six samples after two warmups: 
 
 ### Definition adjustment
 The current scene now uses Resolution Divisor 2 (half resolution) with 48 ray samples and cached cloud shadows enabled. This restores more atmospheric edge detail than divisor 3 while retaining the primary repeated-shadow-work optimization. It costs more than the earlier one-third-resolution balanced preset. New Editor timing samples varied substantially, so the earlier 9.03 ms figure should not be read as a measurement of this current configuration.
+
+## Earth-inspired night sky
+
+The skybox now samples one baked 2048 × 1024 star atlas with mipmaps. It contains 11,000 synthetic stars, with apparent brightness derived from a distribution of distances and luminosities, warm/cool colors, and a denser galactic population. A broad Milky Way band includes a brighter core and mottled dust lanes. This is an Earth-inspired fictional star map, not a catalogue-accurate constellation map. Distance affects brightness; stars remain effectively at infinity, without visible flight-scale parallax.
+
+Star Brightness, Milky Way Brightness, Star Twinkle, Celestial Latitude and Star Map Rotation are exposed on the day/night controller. The map rotates with the 24-hour game clock. Twinkle is subtle and stronger near the horizon. Daylight fades it out, moon glare reduces visibility nearby, the moon disc blocks stars, and cloud transparency naturally obscures the background. Runtime work is a single atlas sample plus simple tint/twinkle math in the existing skybox draw. There are no star GameObjects or runtime atlas generation. The procedural generator runs only from Manta → Environment → Build Earthlike night sky and preserves the atlas asset GUID.
+
+Verified: shader compilation, midnight visual review, changing celestial rotation and daytime fade. The prior scene time and flight-camera orientation were restored after review. Exact astronomical accuracy and standalone frame-time benchmarking are outside this implementation.
+
+## Occasional northern lights
+
+Aurora Enabled on the day/night controller enables seeded nighttime events. Quiet intervals are 180–360 seconds of dark game time; events last 70–130 seconds, including approximately 20-second fades. Daylight suppresses visibility and pauses the event timer. The motion and timer use scaled game time, so pausing time freezes the effect. Preview Aurora forces an event for editing; it is disabled in the saved scene. Brightness, heading, interval, duration and seed are adjustable.
+
+Three analytic skybox curtains combine slow folds, fine vertical filaments, green lower emissions and faint violet upper edges. The moon disc and foreground cloud rendering obscure them. This is an artistic approximation of auroral morphology, not a simulation of magnetic fields or solar activity. No particles, extra objects, new textures or extra render passes are added. Shader work exits during quiet periods, daylight and outside the auroral region.
+
+Visual review and scheduler tests passed for active/quiet phases, fade endpoints, pause and daylight suppression. A 1280 × 720 Editor render-and-sync test measured 20.09 ms with quiet sky versus 21.85 ms during an event, before the final spatial early-outs. These are whole-view timings with readback, not guaranteed player GPU times or FPS.
+
+### Aurora shape variation
+Each curtain now has independent seeded smooth-noise width, height, lateral drift and vertical lift. Aurora Shape Variation controls the amount; Aurora Drift Speed controls the pace of those broad changes. Local folds and fine filaments continue within the changing curtain coordinates. Noise is evaluated only four times per curtain per sky update on the CPU, with a reused three-vector array; no new textures or draw calls are added. Shader bounds expand safely to accommodate the movement. Ten simulated minutes of scale/continuity checks passed and previews at two times were visually reviewed.
+
+### Aurora spatial depth
+Auroras now intersect three curved world-space emitting sheets at different distances, replacing the angular curtain projection. The sheets are anchored to the environment controller, so camera translation produces parallax and perspective rather than carrying the aurora along with the viewer. Fold orientation increases emission toward grazing views; distant sheets dim and shift toward a softer blue-green. Existing independent shape evolution and drift remain active. Aurora Distance Scale adjusts the whole formation's world scale: smaller values strengthen flight parallax. Altitude and distance are deliberately compressed for this scene, not true Earth auroral altitudes.
+
+The existing skybox draw evaluates three bounded intersection iterations per sheet, with conservative bounds checks before solving. No textures, particles or render passes are added. This is a thin-sheet emission approximation, not full volumetric simulation. Shader compilation and visual reviews at two camera positions passed. Repeated 1280 × 720 Editor render/readback timings varied too widely (active medians 12.41–27.55 ms versus quiet 11.46–13.28 ms) to establish a reliable incremental cost; standalone GPU profiling remains unverified. Camera placement, scene time 17.7 and occasional-event mode were restored after review.
+
+### Traveling undulation
+Two smooth waves with different wavelengths and opposing travel directions now roll along each curtain's lower edge. Rays bend progressively with height, giving their upper ends a trailing motion. Each layer has a different phase and pace. Aurora Wave Amount and Aurora Wave Speed control this separately from broad drift; amount zero removes the added deformation. The wave clock follows scaled game time. Bounds include the maximum vertical displacement, preventing ripple crests from being clipped. Three additional sine evaluations per visible sheet reuse the existing skybox pass, without new textures or particles. Compilation and visual comparison eight seconds apart passed; normal scene settings were restored and saved.
+
+### Variable band count
+Each nighttime event now chooses a seeded random count from one to four bands, held until the event fades out. The group stays centered around Aurora Heading; unused bands skip shader work and CPU shape updates. Preview Aurora Bands selects a fixed count for editing. All counts occurred in a 100-event scheduler check (25/27/24/24), with no mid-event changes. One-band and four-band renders were reviewed; compilation passed and the normal scene settings were restored and saved.

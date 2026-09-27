@@ -34611,6 +34611,23 @@ MonoBehaviour:
   dayFogDensity: 0.0005
   nightFogDensity: 0.0008
   starBrightness: 0.4
+  milkyWayBrightness: 2.3
+  starTwinkle: 0.1
+  celestialLatitude: 45
+  starMapRotation: 110
+  auroraEnabled: 1
+  previewAurora: 0
+  previewAuroraBands: 3
+  auroraBrightness: 1.3
+  auroraHeading: 15
+  auroraQuietSeconds: {x: 180, y: 360}
+  auroraDurationSeconds: {x: 70, y: 130}
+  auroraSeed: 270927
+  auroraShapeVariation: 1
+  auroraDriftSpeed: 1
+  auroraWaveAmount: 1
+  auroraWaveSpeed: 1
+  auroraDistanceScale: 1
   godRays: 1
   rayIntensity: 1.8
   raySpread: 0.72
