@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d904f15128de94dad6bb1b0a0af023, type: 3}
+  m_Name: Scattered clouds
+  m_EditorClassIdentifier: 
+  description: Small broken cotton clouds and generous blue-sky gaps.
+  appearance:
+    coverage: 0.32
+    footprint: 0.68
+    thickness: 0.53
+    noiseScale: 1.9
+    erosion: 0.85
+    lenticular: 0
+    layers: 0
+    density: 0.65
+    sunlight: {r: 1, g: 0.89, b: 0.73, a: 1}
+    shadow: {r: 0.36, g: 0.48, b: 0.61, a: 1}
+    wind: {x: 3.3, y: 0.1, z: 0.95}
+    evolution: 0.4
