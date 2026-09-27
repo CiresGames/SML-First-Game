@@ -29475,6 +29475,17 @@ MonoBehaviour:
   evolution: 0.28
   rain: 0
   raySteps: 64
+  distanceLod: 1
+  frustumCulling: 1
+  mediumLodDistance: 450
+  farLodDistance: 1600
+  lodBlendDistance: 500
+  mediumRaySteps: 32
+  farRaySteps: 24
+  cullingBias: 100
+  surfaceShadows: 1
+  surfaceShadowStrength: 0.45
+  surfaceShadowDistance: 1600
 --- !u!4 &1513664296
 Transform:
   m_ObjectHideFlags: 0

@@ -13,7 +13,10 @@ Shader "Hidden/Manta/God Rays"
         TEXTURE2D(_CloudShadowCache);
         float4 _CacheOrigin,_CacheRight,_CacheUp;
         float _CacheSpan;
+        float4 _CacheViewPlanes[6];
+        float _CacheCullMargin;
         float _UseCloudCache;
+        float4 _SurfaceShadow;
         float4 _AirSettings,_ScatterSettings,_SolarRadiance,_SunDirection,_AirTexel;
         float4 _CloudCenters[192],_CloudRadii[192];
         int _CloudCount;
@@ -43,6 +46,10 @@ Shader "Hidden/Manta/God Rays"
             float2 cell=float2(frac(input.texcoord.x*8),input.texcoord.y);
             float3 p=_CacheOrigin.xyz+_CacheSpan*((cell.x-.5)*_CacheRight.xyz+
                 (cell.y-.5)*_CacheUp.xyz+(tile/7-.5)*_SunDirection.xyz);
+            // Retain an interpolation-cell halo so moving cameras never sample a culled neighbour.
+            [unroll] for(int plane=0;plane<6;plane++)
+                if(dot(_CacheViewPlanes[plane].xyz,p)+_CacheViewPlanes[plane].w < -_CacheCullMargin) return 1;
+            if(distance(p,_CacheOrigin.xyz)>_AirSettings.z+_CacheCullMargin) return 1;
             return CloudTransmission(p,_SunDirection.xyz).xxxx;
         }
         float CachedCloudTransmission(float3 p)
@@ -59,6 +66,7 @@ Shader "Hidden/Manta/God Rays"
         }
         half4 Scatter(Varyings input):SV_Target
         {
+            if(_ScatterSettings.y<=.001) return half4(0,0,0,1);
             float2 uv=input.texcoord;
             float raw=Depth(uv);
             #if !UNITY_REVERSED_Z
@@ -98,6 +106,23 @@ Shader "Hidden/Manta/God Rays"
         {
             float2 uv=input.texcoord;
             half4 scene=SAMPLE_TEXTURE2D_X_LOD(_BlitTexture,sampler_PointClamp,uv,0);
+            // Reuse the sun-aligned cache: two filtered reads, no extra cloud ray march.
+            // Shadow opaque scene colour before adding the atmospheric light.
+            float raw=Depth(uv);
+            #if UNITY_REVERSED_Z
+            bool hasSurface=raw>0.000001;
+            #else
+            bool hasSurface=raw<.999999;
+            raw=lerp(UNITY_NEAR_CLIP_VALUE,1,raw);
+            #endif
+            if(hasSurface && _SurfaceShadow.x>0 && _UseCloudCache>.5)
+            {
+                float3 world=ComputeWorldSpacePosition(uv,raw,UNITY_MATRIX_I_VP);
+                float range=distance(world,_CacheOrigin.xyz);
+                float fade=1-smoothstep(_SurfaceShadow.y*.8,_SurfaceShadow.y,range);
+                if(fade>0)
+                    scene.rgb*=1-_SurfaceShadow.x*fade*(1-CachedCloudTransmission(world));
+            }
             float center=LinearEyeDepth(Depth(uv),_ZBufferParams);
             float2 grid=uv*_AirTexel.zw-.5;
             float2 baseUV=(floor(grid)+.5)*_AirTexel.xy;

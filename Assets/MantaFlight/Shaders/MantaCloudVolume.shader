@@ -38,7 +38,7 @@ Shader "Manta/Procedural Cloud Volume"
             TEXTURE3D(_DetailNoise); SAMPLER(sampler_DetailNoise);
             CBUFFER_START(UnityPerMaterial)
             float4 _SunTint, _ShadowTint, _Wind;
-            float4 _ShapeParams, _DetailParams, _FlowOffset;
+            float4 _ShapeParams, _DetailParams, _FlowOffset, _CloudLod;
             float _Density, _Evolution, _Steps, _Seed, _DetailPhase;
             CBUFFER_END
             float4 _LobeCenters[5],_LobeRadii[5];
@@ -80,7 +80,8 @@ Shader "Manta/Procedural Cloud Volume"
                 // Detail erosion can only remove density. Empty samples need no detail lookup.
                 if(baseShape*envelope*height<=threshold) return 0;
                 float3 duv = uv * 5.1 + float3(0,-1,.3)*_DetailPhase*.007;
-                float detail = dot(SAMPLE_TEXTURE3D_LOD(_DetailNoise,sampler_DetailNoise,duv,0).rgb,float3(.6,.3,.1));
+                float detail = .5;
+                if(_CloudLod.y<.999) detail=lerp(dot(SAMPLE_TEXTURE3D_LOD(_DetailNoise,sampler_DetailNoise,duv,0).rgb,float3(.6,.3,.1)),.5,_CloudLod.y);
                 float erosion = (1-detail) * pow(saturate(1-baseShape),3) * _DetailParams.x;
                 float layerMask = lerp(1,smoothstep(-.7,.4,cos(local.y*42)),_DetailParams.z);
                 float fade = smoothstep(0,.1,_ShapeParams.x);
@@ -105,10 +106,12 @@ Shader "Manta/Procedural Cloud Volume"
                 float depth = eyeDepth / max(.001,-TransformWorldToViewDir(direction).z);
                 exit = min(exit,depth);
                 if (exit <= entry) return 0;
-                int steps = (int)clamp(lerp(_Steps,max(32,_Steps*.5),saturate((entry-450)/1400)),32,96);
+                float sampleJitter=frac(52.9829189*frac(dot(input.positionCS.xy,float2(.06711056,.00583715))));
+                int steps = (int)clamp(floor(_Steps+sampleJitter),8,96);
                 float stride = (exit-entry)/steps;
                 float jitter = frac(52.9829189 * frac(dot(input.positionCS.xy,float2(.06711056,.00583715))));
-                float travel = entry + stride*jitter;
+                // Distant low-step volumes use a near-midpoint sample to avoid visible stippling.
+                float travel = entry + stride*lerp(jitter,.5,_CloudLod.x*.85);
                 Light sun = GetMainLight();
                 float3 sunDir = normalize(sun.direction);
                 float silver = pow(saturate(dot(direction,sunDir)),12)*.65;
@@ -121,8 +124,11 @@ Shader "Manta/Procedural Cloud Volume"
                     if(d > .00001)
                     {
                         float optical = DensityAt(p+sunDir*22)*22;
-                        optical += DensityAt(p+sunDir*65)*43;
-                        optical += DensityAt(p+sunDir*140)*75;
+                        float nearDensity=optical/22;
+                        float midDensity=nearDensity,farDensity=nearDensity;
+                        if(_CloudLod.x<.999) farDensity=lerp(DensityAt(p+sunDir*140),nearDensity,_CloudLod.x);
+                        if(_CloudLod.y<.999) midDensity=lerp(DensityAt(p+sunDir*65),nearDensity,_CloudLod.y);
+                        optical+=midDensity*43+farDensity*75;
                         float lighting = exp(-optical*1.35);
                         float3 color = lerp(_ShadowTint.rgb,_SunTint.rgb,lighting) + _SunTint.rgb*silver*lighting;
                         // Atmospheric perspective leaves distant silhouettes soft and legible.

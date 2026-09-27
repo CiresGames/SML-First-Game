@@ -16,10 +16,12 @@ namespace MantaFlight
         public override void AddRenderPasses(ScriptableRenderer renderer,ref RenderingData renderingData)
         {
             var sky=MantaDayNightCycle.Active;
-            if(!material || !sky || !sky.isActiveAndEnabled || sky.RayStrength<=.001f) return;
+            if(!material || !sky || !sky.isActiveAndEnabled) return;
+            bool surface=sky.clouds && sky.clouds.surfaceShadows && sky.clouds.surfaceShadowStrength>0 && sky.Daylight>.001f;
+            if(sky.RayStrength<=.001f && !surface) return;
             if(renderingData.cameraData.cameraType!=CameraType.Game && renderingData.cameraData.cameraType!=CameraType.SceneView) return;
             if(renderingData.cameraData.renderType!=CameraRenderType.Base) return;
-            pass.material=material; pass.cached=cacheCloudShadows; pass.divisor=Mathf.Clamp(resolutionDivisor,2,4); renderer.EnqueuePass(pass);
+            pass.material=material; pass.cached=cacheCloudShadows || surface; pass.divisor=Mathf.Clamp(resolutionDivisor,2,4); renderer.EnqueuePass(pass);
         }
         sealed class AtmospherePass : ScriptableRenderPass
         {
@@ -28,6 +30,8 @@ namespace MantaFlight
             public int divisor;
             readonly Vector4[] centers=new Vector4[192],radii=new Vector4[192];
             readonly List<MantaCloudLayerVolume> banks=new List<MantaCloudLayerVolume>(64);
+            readonly Plane[] viewPlanes=new Plane[6];
+            readonly Vector4[] cachePlanes=new Vector4[6];
             sealed class Data
             {
                 public TextureHandle source,depth,air,shadow,cache;
@@ -75,6 +79,12 @@ namespace MantaFlight
                 block.SetVector("_CacheOrigin",camera.transform.position);
                 block.SetVector("_CacheRight",right); block.SetVector("_CacheUp",up);
                 block.SetFloat("_CacheSpan",sky.rayDistance*2.1f+64);
+                GeometryUtility.CalculateFrustumPlanes(camera,viewPlanes);
+                // Limit the receiver region to the atmospheric integration distance.
+                viewPlanes[5]=new Plane(-camera.transform.forward,camera.transform.position+camera.transform.forward*Mathf.Min(camera.farClipPlane,sky.rayDistance));
+                for(int i=0;i<6;i++) cachePlanes[i]=new Vector4(viewPlanes[i].normal.x,viewPlanes[i].normal.y,viewPlanes[i].normal.z,viewPlanes[i].distance);
+                block.SetVectorArray("_CacheViewPlanes",cachePlanes);
+                block.SetFloat("_CacheCullMargin",(sky.rayDistance*2.1f+64)*.145f+(sky.clouds ? Mathf.Max(0,sky.clouds.cullingBias) : 100));
                 // Three lobes per formation leave narrower, irregular sunlit gaps.
                 // Still analytic: no nested cloud-noise ray march for each air sample.
                 int count=0;
@@ -85,6 +95,15 @@ namespace MantaFlight
                 {
                     if(count>=192) break;
                     var t=bank.transform; var size=t.lossyScale;
+                    if(bank.edgeFade<=.001f || bank.density<=0) continue;
+                    // A cloud outside the view can still shadow visible air. Test its entire
+                    // downstream shadow corridor, not just the cloud's own bounds.
+                    var influence=new Bounds(t.position,new Vector3(Mathf.Abs(size.x),Mathf.Abs(size.y),Mathf.Abs(size.z)));
+                    float reach=Vector3.Distance(t.position,camera.transform.position)+sky.rayDistance+influence.extents.magnitude;
+                    var end=influence; end.center-=sun*reach; influence.Encapsulate(end);
+                    // Include cache interpolation support as well as the user margin.
+                    influence.Expand((Mathf.Max(0,sky.clouds.cullingBias)+(sky.rayDistance*2.1f+64)*.145f)*2);
+                    if(sky.clouds.frustumCulling && !GeometryUtility.TestPlanesAABB(viewPlanes,influence)) continue;
                     for(int l=0;l<3;l++)
                     {
                         var center=bank.lobeCenters[l]; var radius=bank.lobeRadii[l];
@@ -98,9 +117,17 @@ namespace MantaFlight
                 }
                 block.SetVectorArray("_CloudCenters",centers); block.SetVectorArray("_CloudRadii",radii);
                 block.SetInt("_CloudCount",count);
-                Add(graph,r.activeColorTexture,r.cameraDepthTexture,air,r.mainShadowsTexture,cache,cache,2,block);
+                if(cached) Add(graph,r.activeColorTexture,r.cameraDepthTexture,air,r.mainShadowsTexture,cache,cache,2,block);
                 Add(graph,r.activeColorTexture,r.cameraDepthTexture,air,r.mainShadowsTexture,cache,air,0,block);
-                Add(graph,r.activeColorTexture,r.cameraDepthTexture,air,r.mainShadowsTexture,cache,output,1,new MaterialPropertyBlock());
+                var composite=new MaterialPropertyBlock();
+                composite.SetVector("_CacheOrigin",camera.transform.position);
+                composite.SetVector("_CacheRight",right); composite.SetVector("_CacheUp",up);
+                composite.SetVector("_SunDirection",sky.SunDirection);
+                composite.SetFloat("_CacheSpan",sky.rayDistance*2.1f+64);
+                float surfaceStrength=sky.clouds && sky.clouds.surfaceShadows ? sky.clouds.surfaceShadowStrength*sky.Daylight*Mathf.SmoothStep(0,1,Mathf.Clamp01(sun.y/.12f)) : 0;
+                composite.SetVector("_SurfaceShadow",new Vector4(surfaceStrength,sky.clouds ? Mathf.Min(sky.rayDistance,Mathf.Max(50,sky.clouds.surfaceShadowDistance)) : sky.rayDistance,0,0));
+                composite.SetFloat("_UseCloudCache",cached ? 1 : 0);
+                Add(graph,r.activeColorTexture,r.cameraDepthTexture,air,r.mainShadowsTexture,cache,output,1,composite);
                 r.cameraColor=output;
             }
             void Add(RenderGraph graph,TextureHandle source,TextureHandle depth,TextureHandle air,TextureHandle shadow,
@@ -110,14 +137,14 @@ namespace MantaFlight
                 {
                     d.source=source; d.depth=depth; d.air=air; d.shadow=shadow; d.cache=cache; d.index=index; d.material=material; d.block=block;
                     if(index!=2) builder.UseTexture(depth,AccessFlags.Read);
-                    if(index==0) builder.UseTexture(cache,AccessFlags.Read);
+                    if(index!=2 && cached) builder.UseTexture(cache,AccessFlags.Read);
                     if(index==0 && shadow.IsValid()) builder.UseTexture(shadow,AccessFlags.Read);
                     if(index==1) { builder.UseTexture(source,AccessFlags.Read); builder.UseTexture(air,AccessFlags.Read); }
                     builder.SetRenderAttachment(target,0,AccessFlags.Write);
                     builder.SetRenderFunc(static (Data d,RasterGraphContext context)=>
                     {
                         if(d.index!=2) d.block.SetTexture("_SceneDepth",(Texture)d.depth);
-                        if(d.index==0) d.block.SetTexture("_CloudShadowCache",(Texture)d.cache);
+                        if(d.index!=2 && d.block.GetFloat("_UseCloudCache")>.5f) d.block.SetTexture("_CloudShadowCache",(Texture)d.cache);
                         if(d.index==0 && d.shadow.IsValid()) d.block.SetTexture("_MainLightShadowmapTexture",(Texture)d.shadow);
                         if(d.index==1)
                         {
