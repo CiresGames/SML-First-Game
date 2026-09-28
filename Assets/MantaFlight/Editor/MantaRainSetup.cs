@@ -53,6 +53,7 @@ namespace MantaFlight.Editor
                 if(!material) { material=new Material(Shader.Find("Manta/Rain streak")); AssetDatabase.CreateAsset(material,path); }
                 renderer.sharedMaterial=material;
             }
+            local.ApplyMovementTilt();
             EditorUtility.SetDirty(d); EditorUtility.SetDirty(weather); EditorUtility.SetDirty(forecast); EditorUtility.SetDirty(local);
             EditorSceneManager.MarkSceneDirty(clouds.gameObject.scene); EditorSceneManager.SaveScene(clouds.gameObject.scene); AssetDatabase.SaveAssets();
             Selection.activeGameObject=clouds.gameObject;

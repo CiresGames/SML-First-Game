@@ -80,6 +80,14 @@ namespace MantaFlight
             TargetPreset=preset; elapsed=0; duration=Mathf.Max(.1f,seconds); transitioning=true;
         }
 
+        // Session-specific targets preserve the preset asset and reuse the existing smooth blend.
+        public void TransitionToAppearance(MantaCloudPreset preset,CloudAppearance appearance,float seconds)
+        {
+            if(!preset)return;
+            TransitionTo(preset,seconds);
+            destination=appearance;
+        }
+
         int FindNext()
         {
             int length=sequence?.Length ?? 0;

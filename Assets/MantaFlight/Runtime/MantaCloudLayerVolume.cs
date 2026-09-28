@@ -32,7 +32,8 @@ namespace MantaFlight
         public void AdvanceMotion(float seconds)
         {
             if(!clouds || !distribution || seconds<=0) return;
-            var velocity=distribution.transform.InverseTransformVector(new Vector3(clouds.wind.x,0,clouds.wind.z))*windSpeed;
+            var wind=clouds.CurrentWind;
+            var velocity=distribution.transform.InverseTransformVector(new Vector3(wind.x,0,wind.z))*windSpeed;
             var p=transform.localPosition+velocity*seconds;
             var center=distribution.regionCenter;
             float x=distribution.regionSize.x*.5f+transform.localScale.x;

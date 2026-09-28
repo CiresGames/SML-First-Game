@@ -43,6 +43,8 @@ namespace MantaFlight
         [Tooltip("0 is uniform coverage. Higher values gather clouds into broad weather patches.")]
         [Range(0, 1)] public float patchiness = .55f;
         [Min(100)] public float patchSize = 1800;
+        [Tooltip("Seeded density variation across the weather patches. Zero preserves uniform layer density.")]
+        [Range(0,1)] public float patchDensityVariation=.4f;
 
         [Header("Flight corridor")]
         [Tooltip("Half-width and half-length around the region center. Lower clouds avoid this area.")]
@@ -136,7 +138,7 @@ namespace MantaFlight
                     Mathf.Abs(x)<Mathf.Max(0,clearCorridor.x)+size.x*.5f &&
                     Mathf.Abs(z)<Mathf.Max(0,clearCorridor.y)+size.z*.5f) continue;
                 var candidate=new Placement { position=regionCenter+new Vector3(x,y,z),size=size,
-                    layer=layer,density=density,windSpeed=windSpeed };
+                    layer=layer,density=density*Mathf.Lerp(1,Mathf.Lerp(.65f,1.35f,patch),patchDensityVariation),windSpeed=windSpeed };
                 bool crowded=false;
                 foreach(var existing in result)
                 {

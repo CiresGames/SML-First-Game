@@ -24,3 +24,16 @@ The new forecast component owns automatic transitions; the older ordered cloud c
 - Rain shader compiled and the effect was visually inspected.
 - Temporary review probes existed only in Play mode and were discarded on exit.
 - No standalone build or broad hardware benchmark was run.
+
+## Flight-relative rain streaks
+MantaLocalRain now configures the stretched-particle renderer to include camera velocity. Movement Tilt (0–2, default 1) scales cameraVelocityScale relative to the renderer's velocityScale (both 0.045 at the default). This lets flight-camera translation influence the streak direction/length using Unity's native particle rendering. Actual particles remain in world simulation space with their existing downward/wind velocity; player motion is not subtracted from particle velocity a second time. Rain-cloud footprint, shelter checks, collisions and particle limits are unchanged. The renderer reference is cached; no additional particles, per-particle loop or render pass is added.
+
+Compilation and the saved renderer configuration were verified in Unity. A moving-camera visual flight test remains unverified. Native setting reference: https://docs.unity3d.com/2022.3/Documentation/ScriptReference/ParticleSystemRenderer-cameraVelocityScale.html
+
+### Explicit motion correction (supersedes native camera stretch above)
+The native camera stretch produced no visible tilt in the isolated manual-render check. Rain now measures and smooths the viewer's world velocity (14/s response), resets on camera replacement or a displacement over 100 m, and caps measured speed at 200 m/s. A reused property block sends this velocity to the rain vertex shader. The shader shears the existing stretched quad along its U/long axis, leaving world-space drop trajectories, collision and exposure unchanged. Native cameraVelocityScale is zero to avoid applying camera movement twice. Movement Tilt remains the artistic strength control. The alpha profile was corrected to use V across the narrow axis and U along the streak.
+
+Controlled renders with zero and opposite 40 m/s lateral velocity inputs verified vertical and oppositely inclined streaks. This validates the render response; it is not a full interactive flight acceptance test. No extra particle loops, textures or render passes are added.
+
+### Individual drop orientation
+Replaced the quad shear with per-particle billboard reconstruction. Explicit vertex streams supply each drop's world centre and its own velocity. The shader projects (drop velocity minus smoothed viewer velocity) onto the viewing plane, then builds a thin perpendicular-width quad along that direction; length follows apparent speed. Head-on drops fall back to camera-down orientation. Actual simulated trajectories remain unchanged. Validated stream packing and a 45-drop render with differing velocities; the resulting individual inclinations vary correctly. Existing particle count and render pass are retained; additional vertex data and simple vertex math are required.

@@ -11,12 +11,45 @@ namespace MantaFlight
         [Range(100,3000)] public int maximumDrops=2200;
         [Range(5,40)] public float radius=22;
         public LayerMask shelterMask=~0;
+        [Tooltip("How strongly flight-camera movement tilts rain streaks. 1 matches the drop velocity stretch; 0 ignores camera motion.")]
+        [Range(0,2)] public float movementTilt=1;
+        ParticleSystemRenderer rainRenderer;
+        MaterialPropertyBlock motionProperties;
+        Vector3 previousViewerPosition,viewerVelocity;
+        Transform previousViewer;
+        bool hasViewerPosition;
+        static readonly System.Collections.Generic.List<ParticleSystemVertexStream> tiltStreams=new System.Collections.Generic.List<ParticleSystemVertexStream> {
+            ParticleSystemVertexStream.Position,ParticleSystemVertexStream.Color,
+            ParticleSystemVertexStream.UV,ParticleSystemVertexStream.UV2,
+            ParticleSystemVertexStream.Center,ParticleSystemVertexStream.AgePercent,
+            ParticleSystemVertexStream.Velocity
+        };
+        public void ApplyMovementTilt()
+        {
+            if(!rainParticles) return;
+            if(!rainRenderer)
+            {
+                rainRenderer=rainParticles.GetComponent<ParticleSystemRenderer>();
+                if(rainRenderer) rainRenderer.SetActiveVertexStreams(tiltStreams);
+            }
+            if(!rainRenderer) return;
+            // World-space drops keep their physical fall velocity. Only their apparent
+            // streak includes camera motion, avoiding applying player movement twice.
+            rainRenderer.renderMode=ParticleSystemRenderMode.Billboard;
+            rainRenderer.cameraVelocityScale=0;
+            motionProperties ??= new MaterialPropertyBlock();
+            rainRenderer.GetPropertyBlock(motionProperties);
+            motionProperties.SetVector("_RainViewerVelocity",viewerVelocity*Mathf.Clamp(movementTilt,0,2));
+            motionProperties.SetFloat("_RainExposure",rainRenderer.velocityScale);
+            motionProperties.SetFloat("_RainLength",rainRenderer.lengthScale);
+            rainRenderer.SetPropertyBlock(motionProperties);
+        }
         public float LocalRain {get;private set;}
         MantaCloudLayerVolume[] banks;
         ParticleSystem.Particle[] particles;
         System.Random random=new System.Random(7342);
         float cacheTimer,emission;
-        void OnEnable() { particles=new ParticleSystem.Particle[3000]; cacheTimer=0; }
+        void OnEnable() { particles=new ParticleSystem.Particle[3000]; cacheTimer=0; hasViewerPosition=false; viewerVelocity=Vector3.zero; ApplyMovementTilt(); }
         float Next()=> (float)random.NextDouble();
         // A conservative inner elliptical footprint: no rain beyond a cloud's visible envelope.
         public static float Influence(Vector3 p,Vector3 center,Vector3 size,float footprint,float thickness)
@@ -41,6 +74,14 @@ namespace MantaFlight
         {
             if(!viewer && Camera.main) viewer=Camera.main.transform;
             if(!viewer || !clouds || !rainParticles) return;
+            float dt=Time.deltaTime;
+            Vector3 delta=viewer.position-previousViewerPosition;
+            if(!hasViewerPosition || previousViewer!=viewer || delta.sqrMagnitude>10000)
+                viewerVelocity=Vector3.zero;
+            else if(dt>.0001f)
+                viewerVelocity=Vector3.Lerp(viewerVelocity,Vector3.ClampMagnitude(delta/dt,200),1-Mathf.Exp(-dt*14));
+            previousViewerPosition=viewer.position;previousViewer=viewer;hasViewerPosition=true;
+            ApplyMovementTilt();
             cacheTimer-=Time.deltaTime;
             if(cacheTimer<=0) { banks=clouds.GetComponentsInChildren<MantaCloudLayerVolume>(); cacheTimer=1; }
             Vector3 subject=player ? player.position+Vector3.up*2 : viewer.position;
@@ -57,7 +98,7 @@ namespace MantaFlight
                 var p=viewer.position+new Vector3((Next()*2-1)*radius,8+Next()*16,(Next()*2-1)*radius);
                 if(SampleRain(p)<=.001f) continue;
                 var emit=new ParticleSystem.EmitParams {
-                    position=p,velocity=new Vector3(clouds.wind.x*.35f,-Mathf.Lerp(18,32,LocalRain),clouds.wind.z*.35f),
+                    position=p,velocity=new Vector3(clouds.CurrentWind.x*.35f,-Mathf.Lerp(18,32,LocalRain),clouds.CurrentWind.z*.35f),
                     startLifetime=1.4f,startSize=Mathf.Lerp(.025f,.055f,Next()),
                     startColor=new Color(.65f,.75f,.85f,Mathf.Lerp(.18f,.45f,LocalRain))
                 };

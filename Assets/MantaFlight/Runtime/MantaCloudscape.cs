@@ -25,6 +25,9 @@ namespace MantaFlight
         [Range(.1f, 2f)] public float density = .8f;
         [Tooltip("World-space drift in metres per second.")]
         public Vector3 wind = new Vector3(2.8f, .12f, .8f);
+        [System.NonSerialized] public Vector3 windVariation;
+        public Vector3 CurrentWind=>wind+windVariation;
+        public void ResetSessionMotion() {windOffset=Vector3.zero;detailPhase=0;windVariation=Vector3.zero;}
         [Range(0f, 2f)] public float evolution = .35f;
         [Range(0,1)] public float rain;
         [Range(32, 96)] public int raySteps = 64;
@@ -83,7 +86,7 @@ namespace MantaFlight
             if (!Application.isPlaying) return;
             // Integrate velocity instead of multiplying changing wind by absolute time:
             // weather transitions must never teleport the noise pattern.
-            windOffset += wind * Time.deltaTime;
+            windOffset += CurrentWind * Time.deltaTime;
             detailPhase += evolution * Time.deltaTime;
             // Per-camera rendering uploads only visible volumes, after their motion update.
         }

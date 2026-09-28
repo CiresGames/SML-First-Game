@@ -8027,7 +8027,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_RenderMode: 1
+  m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
   m_MinParticleSize: 0
@@ -8046,8 +8046,8 @@ ParticleSystemRenderer:
   m_AllowRoll: 1
   m_FreeformStretching: 0
   m_RotateWithStretchDirection: 1
-  m_UseCustomVertexStreams: 0
-  m_VertexStreams: 00010304
+  m_UseCustomVertexStreams: 1
+  m_VertexStreams: 000304050a1513
   m_UseCustomTrailVertexStreams: 0
   m_TrailVertexStreams: 00010304
   m_Mesh: {fileID: 0}
@@ -29594,6 +29594,7 @@ MonoBehaviour:
   minimumSpacing: 0
   patchiness: 0.55
   patchSize: 1800
+  patchDensityVariation: 0.4
   clearCorridor: {x: 0, y: 0}
   corridorClearance: 0
   volumeMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
@@ -29617,11 +29618,12 @@ MonoBehaviour:
   viewer: {fileID: 375195030}
   player: {fileID: 5783658662179433426}
   rainParticles: {fileID: 173267904}
-  maximumDrops: 2200
-  radius: 22
+  maximumDrops: 3000
+  radius: 40
   shelterMask:
     serializedVersion: 2
     m_Bits: 1
+  movementTilt: 0.3
 --- !u!114 &1513664300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29640,11 +29642,79 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af28d7042ce0e6b42aaa75b5dd016c51, type: 2}
   - {fileID: 11400000, guid: 1a7ef62657e9a334aa654c0a99b80f2a, type: 2}
   - {fileID: 11400000, guid: e0f3779ae84233f47b5a8d422ff60247, type: 2}
+  randomizeSessionSeed: 1
   seed: 90210
+  sessionSeed: 0
+  randomizeStartingForecast: 1
   startingForecast: 2
   automatic: 1
   holdSeconds: {x: 120, y: 240}
   transitionSeconds: {x: 50, y: 90}
+  stateRules:
+  - name: Scattered clouds
+    holdSeconds: {x: 120, y: 240}
+    transitionSeconds: {x: 50, y: 90}
+    initialWeight: 3
+    transitionWeights:
+    - 0.2
+    - 1
+    - 0
+    - 0
+    - 0
+    windMultiplier: {x: 0.7, y: 1.3}
+    windTurn: 35
+  - name: Heavy clouds
+    holdSeconds: {x: 120, y: 240}
+    transitionSeconds: {x: 50, y: 90}
+    initialWeight: 3
+    transitionWeights:
+    - 1
+    - 0.2
+    - 1
+    - 0
+    - 0
+    windMultiplier: {x: 0.7, y: 1.3}
+    windTurn: 35
+  - name: Light rain
+    holdSeconds: {x: 120, y: 240}
+    transitionSeconds: {x: 50, y: 90}
+    initialWeight: 2
+    transitionWeights:
+    - 0
+    - 1
+    - 0.2
+    - 1
+    - 0
+    windMultiplier: {x: 0.7, y: 1.3}
+    windTurn: 35
+  - name: Moderate rain
+    holdSeconds: {x: 120, y: 240}
+    transitionSeconds: {x: 50, y: 90}
+    initialWeight: 1
+    transitionWeights:
+    - 0
+    - 0
+    - 1
+    - 0.2
+    - 1
+    windMultiplier: {x: 0.7, y: 1.3}
+    windTurn: 35
+  - name: Heavy rain
+    holdSeconds: {x: 120, y: 240}
+    transitionSeconds: {x: 50, y: 90}
+    initialWeight: 0.4
+    transitionWeights:
+    - 0
+    - 0
+    - 0
+    - 1
+    - 0.2
+    windMultiplier: {x: 0.7, y: 1.3}
+    windTurn: 35
+  persistenceBias: 0.7
+  gustStrength: 0.18
+  gustPeriod: 45
+  debugForecast: 2
 --- !u!1 &1516836446
 GameObject:
   m_ObjectHideFlags: 0
@@ -34631,7 +34701,7 @@ MonoBehaviour:
   previewAuroraBands: 3
   auroraBrightness: 1.3
   auroraHeading: 15
-  auroraQuietSeconds: {x: 180, y: 360}
+  auroraQuietSeconds: {x: 5, y: 5}
   auroraDurationSeconds: {x: 70, y: 130}
   auroraSeed: 270927
   auroraShapeVariation: 1
