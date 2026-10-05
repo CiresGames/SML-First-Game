@@ -26,6 +26,7 @@ Shader "Manta/Day Night Sky"
             #include "UnityCG.cginc"
             float4 _Zenith,_Horizon,_Ground,_SunDirection,_MoonDirection,_SunColor,_MoonColor;
             float _Daylight,_Stars;
+            float _Overcast;
             sampler2D _StarAtlas;
             float _GalaxyBrightness,_Twinkle;
             float4x4 _StarRotation;
@@ -133,6 +134,11 @@ Shader "Manta/Day Night Sky"
                 float moonWash=(1-pow(moon,32)*.65)*(1-moonDisc);
                 color+=skyLight*lerp(_GalaxyBrightness,_Stars,atlas.a)*twinkle*pow(1-_Daylight,4)*smoothstep(-.01,.2,d.y)*moonWash;
                 color+=Aurora(d)*(1-moonDisc);
+                // Cheap continuous ceiling behind the existing local volume formations.
+                float ceiling=saturate(_Overcast)*smoothstep(-.12,.15,d.y);
+                float mottling=RibbonNoise(d.x*9+d.z*5+_Time.y*.008)*.6+RibbonNoise(d.z*19-d.x*7-_Time.y*.005)*.4;
+                float3 grey=lerp(float3(.018,.024,.035),float3(.21,.23,.26),_Daylight)*lerp(.72,1.18,mottling);
+                color=lerp(color,grey,ceiling);
                 return half4(color,1);
             }
             ENDCG

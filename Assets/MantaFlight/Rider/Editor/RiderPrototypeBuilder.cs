@@ -22,6 +22,7 @@ namespace MantaFlight.Rider.Editor
             move.AddCompositeBinding("2DVector").With("Up","<Keyboard>/w").With("Down","<Keyboard>/s").With("Left","<Keyboard>/a").With("Right","<Keyboard>/d");
             move.AddBinding("<Gamepad>/leftStick");
             var look=map.AddAction("Look",InputActionType.Value,expectedControlLayout:"Vector2");look.AddBinding("<Mouse>/delta");look.AddBinding("<Gamepad>/rightStick");
+            map.AddAction("LookBack",InputActionType.Button).AddBinding("<Gamepad>/rightStickPress");
             Add(map,"Run","<Keyboard>/leftShift","<Gamepad>/leftStickPress");
             Add(map,"Crouch","<Keyboard>/leftCtrl","<Gamepad>/leftShoulder");
             Add(map,"Jump","<Keyboard>/space","<Gamepad>/buttonSouth");

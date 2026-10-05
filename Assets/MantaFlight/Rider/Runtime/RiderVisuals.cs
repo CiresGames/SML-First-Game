@@ -9,6 +9,9 @@ namespace MantaFlight.Rider
         public AudioClip landingClip;
         public AnimationClip landingAnimation;
         public AnimationClip rollingAnimation;
+        [Header("Jump / fall animation")]
+        [Min(0)] public float fallAnimationDelay = .45f;
+        [Min(0)] public float fallAnimationDownSpeed = 5f;
         AudioSource wind;
         AudioClip windClip;
         Vector3 baseScale;
@@ -16,6 +19,7 @@ namespace MantaFlight.Rider
         Quaternion baseRotation;
         string currentAnimation;
         RiderState previous;
+        float flightPhase;
         void Start()
         {
             baseScale=model.localScale; basePosition=model.localPosition; baseRotation=model.localRotation;
@@ -30,12 +34,15 @@ namespace MantaFlight.Rider
         {
             if(rider.Paused) {wind.Pause();return;} if(!wind.isPlaying)wind.UnPause();
             float dt=Time.deltaTime;
+            flightPhase += dt * Mathf.Lerp(2.5f, 8f, Mathf.InverseLerp(8, rider.settings.glide.maximumSpeed, rider.Motor.Velocity.magnitude));
             bool ground=rider.State==RiderState.Grounded || rider.State==RiderState.Landing || rider.State==RiderState.Rolling;
             float speed=Vector3.ProjectOnPlane(rider.Motor.Velocity,Vector3.up).magnitude;
             animator.SetFloat("Speed",ground?speed:0,.12f,dt);
             UpdateAnimation(speed);
             Quaternion pose=Quaternion.Euler(0,0,0);
             if(rider.GlidePose>0) pose=Quaternion.Slerp(Quaternion.identity,Quaternion.Euler(rider.Glide.Pitch,0,-rider.Glide.Bank),rider.GlidePose);
+            float pressure = rider.GlidePose * Mathf.InverseLerp(5, rider.settings.glide.maximumSpeed, rider.Motor.Velocity.magnitude);
+            pose *= Quaternion.Euler(Mathf.Sin(flightPhase)*1.3f*pressure, Mathf.Sin(flightPhase*.73f)*.8f*pressure, Mathf.Sin(flightPhase*1.31f)*1.1f*pressure);
             if(rider.Glide.Stalled && rider.GlidePose>.5f)pose*=Quaternion.Euler(Mathf.Sin(Time.time*8)*9,0,Mathf.Sin(Time.time*6)*10);
             model.localRotation=baseRotation*pose;
             model.localPosition=basePosition;
@@ -68,13 +75,22 @@ namespace MantaFlight.Rider
                     next=rider.Motor.Crouched?"Crouch":"Locomotion";
                     if(rider.Motor.Crouched) playback=Mathf.Clamp(speed/Mathf.Max(.1f,rider.settings.ground.crouchSpeed),0,1.5f);
                     break;
-                default: next=rider.Motor.Velocity.y>0?"Jump":"Fall"; break;
+                default:
+                    // Keep the take-off readable across the apex; latch Fall until a new ascent.
+                    bool falling = ShouldPlayFall(rider.AirTime, rider.Motor.Velocity.y,
+                        fallAnimationDelay, fallAnimationDownSpeed, currentAnimation == "Fall");
+                    next=falling?"Fall":"Jump";
+                    break;
             }
             animator.SetFloat("ActionSpeed",playback);
             if(next==currentAnimation)return;
             // The movement state owns timing; root motion must never move the capsule.
             animator.CrossFadeInFixedTime(next,next=="Roll" || next=="Land"?.05f:.15f,0,0);
             currentAnimation=next;
+        }
+        public static bool ShouldPlayFall(float airTime, float verticalSpeed, float delay, float downSpeed, bool wasFalling)
+        {
+            return verticalSpeed <= 0 && (wasFalling || (airTime >= delay && verticalSpeed <= -downSpeed));
         }
         void OnDestroy(){if(windClip!=null)Destroy(windClip);}
     }

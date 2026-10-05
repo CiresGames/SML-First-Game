@@ -29,16 +29,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Daylight: 0.6871372
+    - _Daylight: 1
     - _GalaxyBrightness: 2.3
     - _Stars: 0.4
     m_Colors:
-    - _Ground: {r: 0.37634778, g: 0.2628574, b: 0.24285562, a: 0.7}
-    - _Horizon: {r: 0.5376397, g: 0.37551057, b: 0.3469366, a: 1}
+    - _Ground: {r: 0.336, g: 0.4172, b: 0.476, a: 0.7}
+    - _Horizon: {r: 0.6, g: 0.76, b: 0.86, a: 1}
     - _MoonColor: {r: 0.6, g: 0.87, b: 1.5, a: 1.5}
-    - _MoonDirection: {r: 0.42131546, g: -0.0784588, b: -0.90351397, a: 0}
-    - _SunColor: {r: 3.5, g: 1.7207115, b: 0.7559782, a: 3.5}
-    - _SunDirection: {r: -0.42131546, g: 0.0784588, b: 0.90351397, a: 0}
-    - _Zenith: {r: 0.059663914, g: 0.20053285, b: 0.39826155, a: 1}
+    - _MoonDirection: {r: -0.36599815, g: -0.49999997, b: 0.7848856, a: 0}
+    - _SunColor: {r: 0.1049999, g: 0.09358902, b: 0.080384955, a: 0.1049999}
+    - _SunDirection: {r: 0.36599815, g: 0.49999997, b: -0.7848856, a: 0}
+    - _Zenith: {r: 0.08, g: 0.28, b: 0.55, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

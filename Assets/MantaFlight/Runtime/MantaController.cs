@@ -6,6 +6,16 @@ namespace MantaFlight
     public sealed class MantaController : MonoBehaviour
     {
         public MantaFlightSettings settings;
+        [Tooltip("Fraction du vent résiduel après compensation de la manta.")][Range(0, 1)] public float windDrift = .12f;
+        [Tooltip("Réactivité de la compensation des rafales, par seconde.")][Min(.1f)] public float windResponse = 2;
+        Vector3 windVelocity;
+        public Vector3 WindDriftVelocity => windVelocity;
+        public Vector3 SampleWindDrift(float dt)
+        {
+            windVelocity = Vector3.Lerp(windVelocity, WindManager.GetWindAt(PhysicsPosition) * windDrift,
+                MantaFlightSettings.Damp(windResponse, dt));
+            return windVelocity;
+        }
         public MantaFlightSettings SourceSettings { get; private set; }
         public float Speed { get; private set; }
         public Vector3 Velocity { get; private set; }
@@ -89,10 +99,11 @@ namespace MantaFlight
             float easedBank = Mathf.Lerp(Bank, targetBank, MantaFlightSettings.Damp(s.bankingSmoothing, dt));
             Bank = Mathf.MoveTowards(Bank, easedBank, s.rollSpeed * dt);
             Vector3 wanted = Heading * Vector3.forward;
-            Vector3 direction = Vector3.Slerp(Velocity.sqrMagnitude > .01f ? Velocity.normalized : wanted, wanted,
+            Vector3 airVelocity = Velocity - windVelocity;
+            Vector3 direction = Vector3.Slerp(airVelocity.sqrMagnitude > .01f ? airVelocity.normalized : wanted, wanted,
                 MantaFlightSettings.Damp(maneuvers.ControlsHeading ? 28 : s.momentumResponse * (tight ? 2 : 1), dt)).normalized;
             if (maneuvers.HasTravelOverride) direction = maneuvers.TravelDirection;
-            Velocity = direction * Speed;
+            Velocity = direction * Speed + SampleWindDrift(dt);
             MoveSafely(Velocity * dt);
             body.MoveRotation(Heading);
             Acceleration = (Speed - before) / dt;
@@ -169,6 +180,7 @@ namespace MantaFlight
             if (body == null) return;
             maneuvers.ResetState(); Heading = spawnRotation; SyncAngles();
             yawRate = pitchRate = Bank = Acceleration = 0; recoveringOrientation = false;
+            windVelocity = Vector3.zero;
             Speed = settings.cruiseSpeed; Velocity = Heading * Vector3.forward * Speed;
             body.position = spawnPosition; body.rotation = Heading;
             transform.SetPositionAndRotation(spawnPosition, Heading);

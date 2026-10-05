@@ -22,6 +22,9 @@ namespace MantaFlight
         [Range(.5f, 3)] public float sensitivityExponent = 1.4f;
         [Range(.001f, .2f)] public float mouseSensitivity = .035f;
         public bool invertPitch;
+        [Min(0)] public float mouseLookSensitivity=.08f, stickLookSensitivity=100;
+        public Vector2 LookDelta { get; private set; }
+        public bool LookBackHeld { get; private set; }
         public bool ControlEnabled { get; set; } = true;
         public FlightInput State { get; private set; }
         public bool MenuOpen { get; private set; }
@@ -30,7 +33,7 @@ namespace MantaFlight
         public event Action MenuChanged;
         public event Action HudRequested;
         InputActionMap flight;
-        InputAction steer, lift, mouse, mouseEnable;
+        InputAction steer, lift, mouse, mouseEnable, look;
         InputActionRebindingExtensions.RebindingOperation rebind;
         MantaTrick queued;
         Vector2 mouseSteer;
@@ -49,6 +52,7 @@ namespace MantaFlight
             lift = flight.FindAction("Climb", true);
             mouse = flight.FindAction("MouseSteering", true);
             mouseEnable = flight.FindAction("MouseEnable", true);
+            look = flight.FindAction("Look", true);
             Hook("RollLeft", MantaTrick.RollLeft); Hook("RollRight", MantaTrick.RollRight);
             Hook("Turnaround", MantaTrick.Turnaround);
             flight["Reset"].performed += _ => { if (!MenuOpen) ResetRequested?.Invoke(); };
@@ -73,13 +77,24 @@ namespace MantaFlight
         void OnEnable() { if (actions != null) actions.Enable(); }
         void OnDisable()
         {
-            rebind?.Cancel(); actions?.Disable(); queued = MantaTrick.None; State = default;
+            rebind?.Cancel(); actions?.Disable(); queued = MantaTrick.None; State = default; LookBackHeld=false;
+            LookDelta=Vector2.zero;
             Cursor.lockState = CursorLockMode.None; Cursor.visible = true;
         }
         void OnDestroy() { rebind?.Dispose(); if (actions != null) Destroy(actions); }
-        void Update()
+        void Update()=>Read(Time.deltaTime);
+        public void Read(float dt)
         {
+            LookDelta=Vector2.zero;
+            LookBackHeld=false;
+            // One cursor owner for mounted and Rider modes; menus always release it.
+            Cursor.lockState=MenuOpen?CursorLockMode.None:CursorLockMode.Locked;
+            Cursor.visible=MenuOpen;
             if (MenuOpen || !ControlEnabled) { State = default; queued = MantaTrick.None; return; }
+            LookBackHeld=flight["LookBack"].IsPressed();
+            bool mouseLook=look.activeControl?.device is Mouse;
+            if(!mouseLook || !mouseEnable.IsPressed())
+                LookDelta=look.ReadValue<Vector2>()*(mouseLook?mouseLookSensitivity:stickLookSensitivity*Mathf.Max(0,dt));
             Vector2 value = steer.ReadValue<Vector2>();
             if (steer.activeControl == null || steer.activeControl.device is Gamepad)
             {
@@ -98,11 +113,11 @@ namespace MantaFlight
             {
                 // Relative virtual stick: responsive steering, with an exponential return to centre.
                 mouseSteer = Vector2.ClampMagnitude(mouseSteer + mouse.ReadValue<Vector2>() * mouseSensitivity, 1);
-                mouseSteer *= Mathf.Exp(-3 * Time.unscaledDeltaTime);
+                mouseSteer *= Mathf.Exp(-3 * Mathf.Max(0,dt));
                 value += mouseSteer;
                 Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false;
             }
-            else { mouseSteer = Vector2.zero; Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
+            else { mouseSteer = Vector2.zero; }
             float liftValue = lift.ReadValue<float>();
             if (lift.activeControl == null || lift.activeControl.device is Gamepad)
             {
@@ -123,7 +138,8 @@ namespace MantaFlight
         public void SetMenu(bool open)
         {
             if (!open) CancelRebind();
-            MenuOpen = open; queued = MantaTrick.None; mouseSteer = Vector2.zero;
+            MenuOpen = open; queued = MantaTrick.None; mouseSteer = Vector2.zero; LookBackHeld=false;
+            LookDelta=Vector2.zero;
             State = default; Cursor.lockState = CursorLockMode.None; Cursor.visible = true;
             MenuChanged?.Invoke();
         }

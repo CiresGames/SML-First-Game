@@ -69,8 +69,8 @@ MonoBehaviour:
     windMinPitch: 0.65
     windMaxPitch: 1.6
   camera:
-    groundDistance: 5
-    groundHeight: 1.4
+    groundDistance: 8
+    groundHeight: 2
     fallDistance: 6
     glideDistance: 6
     speedPullback: 5

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d904f15128de94dad6bb1b0a0af023, type: 3}
+  m_Name: Grey overcast
+  m_EditorClassIdentifier: 
+  description: Continuous grey ceiling, diffuse daylight, no precipitation until
+    a rain front develops.
+  appearance:
+    coverage: 0.95
+    footprint: 1
+    thickness: 0.88
+    noiseScale: 0.65
+    erosion: 0.25
+    lenticular: 0
+    layers: 0
+    density: 1.35
+    sunlight: {r: 0.6, g: 0.64, b: 0.69, a: 1}
+    shadow: {r: 0.22, g: 0.25, b: 0.3, a: 1}
+    wind: {x: 4.4, y: 0.06, z: 1.8}
+    evolution: 0.52
+    rain: 0
+    overcast: 0.95
+    thunder: 0

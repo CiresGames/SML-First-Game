@@ -5,7 +5,7 @@ namespace MantaFlight.Rider
     public struct RiderCommand
     {
         public Vector2 move, look, glide;
-        public bool run, crouch, jump, roll, context, toggleGlide, call, callHeld, callReleased, jumpOff, drop;
+        public bool run, crouch, jump, roll, context, toggleGlide, call, callHeld, callReleased, jumpOff, drop, lookBack;
     }
     public sealed class RiderInput : MonoBehaviour
     {
@@ -26,7 +26,7 @@ namespace MantaFlight.Rider
             look *= map["Look"].activeControl?.device is Mouse ? settings.mouseLookSensitivity : settings.stickLookSensitivity * dt;
             if (map["InvertPitch"].WasPressedThisFrame()) UserSettings.SetInvertPitch(!UserSettings.InvertPitch);
             return new RiderCommand { move = move, look = look, glide = new Vector2(move.x, move.y * (UserSettings.InvertPitch ? -1 : 1)),
-                run = map["Run"].IsPressed(), crouch = map["Crouch"].IsPressed(), jump = Press("Jump"), roll = Press("Roll"),
+                lookBack = map["LookBack"].IsPressed(), run = map["Run"].IsPressed(), crouch = map["Crouch"].IsPressed(), jump = Press("Jump"), roll = Press("Roll"),
                 context = Press("Context"), toggleGlide = Press("Glide"), call = Press("Call"), callHeld = map["Call"].IsPressed(), callReleased = map["Call"].WasReleasedThisFrame(), jumpOff = Press("JumpOff"), drop = Press("Drop") };
         }
         bool Press(string name) => map[name].WasPressedThisFrame();

@@ -18,6 +18,8 @@ namespace MantaFlight
         public Vector3 wind;
         [Range(0, 2)] public float evolution;
         [Range(0,1)] public float rain;
+        [Tooltip("Grey cloud ceiling and suppression of direct sunlight.")][Range(0,1)] public float overcast;
+        [Tooltip("Electrical storm activity, independent of rain intensity.")][Range(0,1)] public float thunder;
 
         public static CloudAppearance Lerp(CloudAppearance a, CloudAppearance b, float t) => new CloudAppearance
         {
@@ -26,7 +28,8 @@ namespace MantaFlight
             erosion = Mathf.Lerp(a.erosion,b.erosion,t), lenticular = Mathf.Lerp(a.lenticular,b.lenticular,t),
             layers = Mathf.Lerp(a.layers,b.layers,t), density = Mathf.Lerp(a.density,b.density,t),
             sunlight = Color.Lerp(a.sunlight,b.sunlight,t), shadow = Color.Lerp(a.shadow,b.shadow,t),
-            wind = Vector3.Lerp(a.wind,b.wind,t), evolution = Mathf.Lerp(a.evolution,b.evolution,t), rain=Mathf.Lerp(a.rain,b.rain,t)
+            wind = Vector3.Lerp(a.wind,b.wind,t), evolution = Mathf.Lerp(a.evolution,b.evolution,t), rain=Mathf.Lerp(a.rain,b.rain,t),
+            overcast=Mathf.Lerp(a.overcast,b.overcast,t),thunder=Mathf.Lerp(a.thunder,b.thunder,t)
         };
     }
 

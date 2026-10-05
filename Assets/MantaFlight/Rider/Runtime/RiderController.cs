@@ -21,6 +21,7 @@ namespace MantaFlight.Rider
         public bool Mounted => State == RiderState.Mounted;
         public bool Attached => Mounted || State == RiderState.Remounting;
         public Vector2 LookInput { get; private set; }
+        public bool LookBackHeld { get; private set; }
         public float AirTime { get; private set; }
         public float SinceDetach { get; private set; }
         public float StateTime { get; private set; }
@@ -60,6 +61,7 @@ namespace MantaFlight.Rider
             if (dt <= 0) return;
             mountCollisions.Tick(this, dt);
             LookInput = command.look;
+            LookBackHeld = command.lookBack;
             dt = Mathf.Min(dt,.05f); StateTime += dt; SinceDetach += dt;
             rollCooldown = Mathf.Max(0,rollCooldown-dt); LandingPulse = Mathf.MoveTowards(LandingPulse,0,dt / settings.camera.landingPulseDuration);
             if (State == RiderState.Grounded) LandingTarget.Tick(command.callHeld, command.callReleased);

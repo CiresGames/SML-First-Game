@@ -116,7 +116,7 @@ namespace MantaFlight
             int row = 0;
             foreach (var action in input.actions.FindActionMap("Flight").actions)
             {
-                if (action.name == "Menu" || action.name == "HUD" || action.name == "MouseSteering") continue;
+                if (action.name == "Menu" || action.name == "HUD" || action.name == "MouseSteering" || action.name == "Look") continue;
                 for (int i = 0; i < action.bindings.Count; i++)
                 {
                     var binding = action.bindings[i];

@@ -10,7 +10,8 @@ namespace MantaFlight.Rider
         public RiderController rider;
         public MantaServiceState Mode { get; private set; }
         public Transform Seat => seat;
-        public Vector3 Velocity => Mode == MantaServiceState.Piloted ? manta.Velocity : velocity;
+        public Vector3 Velocity => Mode == MantaServiceState.Piloted ? manta.Velocity : velocity + (WindDrifting ? manta.WindDriftVelocity : Vector3.zero);
+        bool WindDrifting => Mode == MantaServiceState.Following || (Mode == MantaServiceState.Idle && !landed);
         public bool Calling => Mode == MantaServiceState.Intercept || Mode == MantaServiceState.Retry || Mode == MantaServiceState.Landing;
         public Vector3 InterceptTarget { get; private set; }
         public int PassCount { get; private set; }
@@ -195,6 +196,9 @@ namespace MantaFlight.Rider
         void Move(Vector3 motion,float dt)
         {
             Vector3 position = Position;
+            // La dérive résiduelle reste soumise au balayage de collision existant.
+            Vector3 drift = manta.SampleWindDrift(dt);
+            if (WindDrifting) motion += drift;
             Vector3 delta = motion * dt;
             for(int i=0;i<3 && delta.sqrMagnitude > .00001f;i++)
             {
@@ -213,7 +217,7 @@ namespace MantaFlight.Rider
                 Vector3 up=Mathf.Abs(forward.y)>.96f ? heading*Vector3.up : Vector3.up;
                 heading=Quaternion.RotateTowards(heading,Quaternion.LookRotation(forward,up),S.callTurnRate*dt);
             }
-            manta.MoveExternalMotion(position,heading,velocity);
+            manta.MoveExternalMotion(position,heading,velocity + (WindDrifting ? drift : Vector3.zero));
         }
         float GroundDistance() => Physics.Raycast(Position,Vector3.down,out var hit,100,rider.settings.environment,QueryTriggerInteraction.Ignore) ? hit.distance : 100;
         public bool CanDismount(out Vector3 groundPosition)

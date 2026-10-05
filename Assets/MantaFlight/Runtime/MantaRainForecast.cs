@@ -17,7 +17,7 @@ namespace MantaFlight
     [RequireComponent(typeof(MantaCloudWeather)),DefaultExecutionOrder(-115)]
     public sealed class MantaRainForecast : MonoBehaviour
     {
-        [Tooltip("Ordered progression: fair, overcast, light rain, moderate rain, heavy rain. Existing cloud presets define density, coverage, rain and base wind.")]
+        [Tooltip("Ordered progression: sunny, scattered clouds, overcast, light rain, moderate rain, heavy rain, thunderstorm. Presets define coverage, rain, lighting and base wind.")]
         public MantaCloudPreset[] forecasts;
         [Tooltip("Generate a fresh seed at each Play/session start. Disable for reproducible weather.")]
         public bool randomizeSessionSeed=true;
@@ -25,8 +25,9 @@ namespace MantaFlight
         [SerializeField,Tooltip("Actual seed for this session. Copy it into Seed and disable randomization to replay.")] int sessionSeed;
         public int SessionSeed=>sessionSeed;
         [Tooltip("Choose initial weather using per-state Initial Weight.")] public bool randomizeStartingForecast=true;
-        [Range(0,4)] public int startingForecast=2;
+        [Min(0)] public int startingForecast=2;
         public bool automatic=true;
+        [Tooltip("Duration of manually requested weather changes in Play mode.")][Min(1)] public float previewBlendSeconds=30;
         [Tooltip("Fallback dwell range for states without an override.")] public Vector2 holdSeconds=new Vector2(120,240);
         [Tooltip("Fallback blend range for states without an override.")] public Vector2 transitionSeconds=new Vector2(50,90);
         public MantaForecastRules[] stateRules;
@@ -136,7 +137,7 @@ namespace MantaFlight
             if(forecasts==null || index<0 || index>=forecasts.Length || !forecasts[index])return;
             if(!weather)weather=GetComponent<MantaCloudWeather>();
             automatic=false;current=index;
-            if(Application.isPlaying)weather.TransitionTo(forecasts[index],15);
+            if(Application.isPlaying)weather.TransitionTo(forecasts[index],previewBlendSeconds);
             else GetComponent<MantaCloudscape>().SetAppearance(forecasts[index].appearance);
         }
     }

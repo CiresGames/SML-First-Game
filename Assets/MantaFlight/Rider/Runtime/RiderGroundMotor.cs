@@ -5,6 +5,8 @@ namespace MantaFlight.Rider
     public sealed class RiderGroundMotor : MonoBehaviour
     {
         public RiderSettings settings;
+        [Tooltip("Activer une légère poussée du vent à pied.")] public bool windOnFoot;
+        [Tooltip("Réponse au vent au sol, par seconde ; déplacement toujours soumis aux collisions.")][Range(0, .3f)] public float groundWindInfluence = .04f;
         public Vector3 Velocity { get; set; }
         public bool Crouched { get; private set; }
         public bool Grounded { get; private set; }
@@ -46,6 +48,8 @@ namespace MantaFlight.Rider
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), s.turnRate * dt);
             }
             else horizontal = Vector3.MoveTowards(horizontal, Vector3.zero, s.deceleration * dt);
+            if (windOnFoot && !locked)
+                horizontal += Vector3.ProjectOnPlane(WindManager.GetWindAt(transform.position), Vector3.up) * groundWindInfluence * dt;
             Velocity = horizontal + Vector3.down * 2;
             Move(dt);
         }

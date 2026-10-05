@@ -30,6 +30,7 @@ namespace MantaFlight
         public void ResetSessionMotion() {windOffset=Vector3.zero;detailPhase=0;windVariation=Vector3.zero;}
         [Range(0f, 2f)] public float evolution = .35f;
         [Range(0,1)] public float rain;
+        [Range(0,1)] public float overcast,thunder;
         [Range(32, 96)] public int raySteps = 64;
         [Header("Distance LOD and visibility")]
         public bool distanceLod=true, frustumCulling=true;
@@ -95,7 +96,7 @@ namespace MantaFlight
         {
             coverage=coverage, footprint=footprint, thickness=thickness, noiseScale=noiseScale,
             erosion=erosion, lenticular=lenticular, layers=layers, density=density,
-            sunlight=sunlight, shadow=shadow, wind=wind, evolution=evolution,rain=rain
+            sunlight=sunlight, shadow=shadow, wind=wind, evolution=evolution,rain=rain,overcast=overcast,thunder=thunder
         };
 
         public void SetAppearance(CloudAppearance a)
@@ -103,6 +104,7 @@ namespace MantaFlight
             coverage=a.coverage; footprint=a.footprint; thickness=a.thickness; noiseScale=a.noiseScale;
             erosion=a.erosion; lenticular=a.lenticular; layers=a.layers; density=a.density;
             sunlight=a.sunlight; shadow=a.shadow; wind=a.wind; evolution=a.evolution; rain=a.rain;
+            overcast=a.overcast;thunder=a.thunder;
             if(!Application.isPlaying) Apply();
         }
 
@@ -146,9 +148,9 @@ namespace MantaFlight
                 properties.SetColor("_SunTint", Color.Lerp(sunlight,new Color(.5f,.54f,.6f),storm*.7f) * environmentKey);
                 properties.SetColor("_ShadowTint", Color.Lerp(shadow,new Color(.09f,.12f,.17f),storm*.8f) * environmentFill);
                 properties.SetFloat("_Density", density*densityScale);
-                properties.SetVector("_Wind", wind);
+                properties.SetVector("_Wind", WindManager.Instance ? WindManager.GetWindAt(volume.transform.position) : CurrentWind);
                 properties.SetFloat("_Evolution", evolution);
-                properties.SetVector("_FlowOffset", windOffset*speed);
+                properties.SetVector("_FlowOffset", layer && WindManager.Instance ? layer.WindFlowOffset : windOffset*speed);
                 properties.SetFloat("_DetailPhase", detailPhase);
                 if(layer)
                 {

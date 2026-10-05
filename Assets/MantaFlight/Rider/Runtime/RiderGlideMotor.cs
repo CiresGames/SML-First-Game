@@ -4,6 +4,7 @@ namespace MantaFlight.Rider
     public sealed class RiderGlideMotor : MonoBehaviour
     {
         public RiderSettings settings;
+        [Tooltip("Influence du vent sur la vitesse relative de vol (0 désactive).")][Range(0, 1)] public float windInfluence = 1;
         public float Pitch { get; private set; }
         public float Bank { get; private set; }
         public float Yaw { get; private set; }
@@ -15,6 +16,7 @@ namespace MantaFlight.Rider
 
         public void Deploy(Vector3 velocity)
         {
+            velocity -= WindManager.GetWindAt(transform.position) * windInfluence;
             Vector3 v = velocity.sqrMagnitude > 1 ? velocity.normalized : transform.forward;
             Yaw = Mathf.Atan2(v.x, v.z) * Mathf.Rad2Deg;
             Pitch = Mathf.Clamp(-Mathf.Asin(v.y) * Mathf.Rad2Deg, -settings.glide.pitchLimit, settings.glide.pitchLimit);
@@ -26,6 +28,9 @@ namespace MantaFlight.Rider
         {
             var s = settings.glide;
             if (dt <= 0) return velocity;
+            // Intégrer les forces dans le référentiel de l'air, puis retourner une vitesse monde.
+            Vector3 wind = WindManager.GetWindAt(transform.position) * windInfluence;
+            velocity -= wind;
             float speed = velocity.magnitude;
             Vector3 direction = speed > .1f ? velocity / speed : Heading * Vector3.forward;
             smoothedInput = Vector2.Lerp(smoothedInput, input, MantaFlightSettings.Damp(s.inputSmoothing, dt));
@@ -73,7 +78,7 @@ namespace MantaFlight.Rider
             Vector3 acceleration = Vector3.down * Mathf.Lerp(settings.ground.gravity, s.gravity, deployment)
                 + liftDirection * lift - direction * drag * deployment;
             acceleration += Vector3.down * Mathf.Max(0, -forward.y) * s.diveAcceleration * deployment;
-            return Vector3.ClampMagnitude(velocity + acceleration * dt, Mathf.Max(s.maximumSpeed, s.recoverSpeed));
+            return Vector3.ClampMagnitude(velocity + acceleration * dt, Mathf.Max(s.maximumSpeed, s.recoverSpeed)) + wind;
         }
     }
 }

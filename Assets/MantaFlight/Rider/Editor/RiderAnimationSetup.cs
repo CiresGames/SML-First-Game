@@ -32,7 +32,9 @@ namespace MantaFlight.Rider.Editor
                     clip.loopTime = i < 4;
                     clip.loopPose = i < 4;
                     clip.lockRootRotation = true;
-                    clip.lockRootPositionXZ = true;
+                    // The motor supplies roll travel. Extract the clip's horizontal root
+                    // motion so it cannot move the mesh ahead of the capsule then snap back.
+                    clip.lockRootPositionXZ = Files[i] != "Falling To Roll";
                     clip.lockRootHeightY = true;
                     clip.keepOriginalOrientation = true;
                     clip.keepOriginalPositionXZ = true;

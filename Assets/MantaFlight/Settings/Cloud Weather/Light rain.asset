@@ -28,3 +28,5 @@ MonoBehaviour:
     wind: {x: 3, y: 0.03, z: 0.75}
     evolution: 0.52
     rain: 0.2
+    overcast: 0.6
+    thunder: 0

@@ -7,6 +7,7 @@ namespace MantaFlight
     public sealed class MantaCloudLayerVolume : MonoBehaviour
     {
         public float density=1;
+        public Vector3 WindFlowOffset { get; private set; }
         public float windSpeed=1;
         public bool rainCloud;
         public Vector4[] lobeCenters=new Vector4[5];
@@ -32,7 +33,8 @@ namespace MantaFlight
         public void AdvanceMotion(float seconds)
         {
             if(!clouds || !distribution || seconds<=0) return;
-            var wind=clouds.CurrentWind;
+            var wind=WindManager.Instance ? WindManager.GetWindAt(transform.position) : clouds.CurrentWind;
+            WindFlowOffset += wind * windSpeed * seconds;
             var velocity=distribution.transform.InverseTransformVector(new Vector3(wind.x,0,wind.z))*windSpeed;
             var p=transform.localPosition+velocity*seconds;
             var center=distribution.regionCenter;

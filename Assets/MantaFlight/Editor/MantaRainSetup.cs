@@ -68,12 +68,16 @@ namespace MantaFlight.Editor
             a.wind=new Vector3(wind,.03f,wind*.25f); a.sunlight=new Color(.59f,.63f,.69f); a.shadow=new Color(.13f,.17f,.23f);
             p.appearance=a; AssetDatabase.CreateAsset(p,path); return p;
         }
-        [MenuItem("Manta/Environment/Preview rain/Light")] static void Light()=>Preview(2);
-        [MenuItem("Manta/Environment/Preview rain/Moderate")] static void Moderate()=>Preview(3);
-        [MenuItem("Manta/Environment/Preview rain/Heavy")] static void Heavy()=>Preview(4);
-        static void Preview(int index)
+        [MenuItem("Manta/Environment/Preview rain/Light")] static void Light()=>Preview("Light rain");
+        [MenuItem("Manta/Environment/Preview rain/Moderate")] static void Moderate()=>Preview("Moderate rain");
+        [MenuItem("Manta/Environment/Preview rain/Heavy")] static void Heavy()=>Preview("Heavy rain");
+        [MenuItem("Manta/Environment/Preview rain/Grey overcast")] static void Grey()=>Preview("Grey overcast");
+        [MenuItem("Manta/Environment/Preview rain/Thunderstorm")] static void Storm()=>Preview("Thunderstorm");
+        [MenuItem("Manta/Environment/Preview weather/Sunny")] static void Sunny()=>Preview("Sunny");
+        static void Preview(string name)
         {
-            var f=Object.FindFirstObjectByType<MantaRainForecast>(); if(f) f.Preview(index);
+            var f=Object.FindFirstObjectByType<MantaRainForecast>();
+            if(f && f.forecasts!=null) f.Preview(System.Array.FindIndex(f.forecasts,p=>p && p.name==name));
         }
         public static string Validate()
         {

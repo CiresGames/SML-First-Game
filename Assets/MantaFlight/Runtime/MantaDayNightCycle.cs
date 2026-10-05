@@ -152,9 +152,11 @@ namespace MantaFlight
             float highSun=Mathf.SmoothStep(0,1,Mathf.InverseLerp(.02f,.65f,elevation));
             float dusk=(1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(0,.38f,Mathf.Abs(elevation))))*Daylight;
             float storm=clouds ? Mathf.InverseLerp(.95f,1.5f,clouds.density) : 0;
+            float overcast=clouds ? Mathf.Clamp01(clouds.overcast) : 0;
             sun.color=Color.Lerp(sunsetColor,daylightColor,highSun);
             sun.intensity=daylightIntensity*Mathf.SmoothStep(0,1,Mathf.InverseLerp(-.03f,.4f,elevation))*(1-storm*.45f);
             sun.enabled=elevation>-.04f;
+            sun.intensity*=Mathf.Lerp(1,.18f,overcast);
             moon.color=moonlightColor;
             moon.intensity=moonlightIntensity*(1-Daylight);
             moon.enabled=Daylight<.99f;
@@ -189,10 +191,11 @@ namespace MantaFlight
                 sky=runtimeSky;
             }
             sky.SetColor("_Zenith",Color.Lerp(nightZenith,dayZenith,Daylight));
+            sky.SetFloat("_Overcast",overcast);
             sky.SetColor("_Horizon",horizon);
             sky.SetColor("_Ground",RenderSettings.fogColor*.7f);
             sky.SetVector("_SunDirection",SunDirection); sky.SetVector("_MoonDirection",-SunDirection);
-            sky.SetColor("_SunColor",sun.color*3.5f);
+            sky.SetColor("_SunColor",sun.color*3.5f*(1-overcast*.97f));
             sky.SetColor("_MoonColor",moonlightColor*1.5f);
             sky.SetFloat("_Daylight",Daylight); sky.SetFloat("_Stars",starBrightness);
             sky.SetFloat("_GalaxyBrightness",milkyWayBrightness); sky.SetFloat("_Twinkle",starTwinkle);
@@ -208,7 +211,7 @@ namespace MantaFlight
             RenderSettings.skybox=sky;
             if(clouds)
                 clouds.SetEnvironmentLighting(
-                    Color.Lerp(new Color(.16f,.25f,.44f),Color.Lerp(new Color(1.3f,.65f,.35f),new Color(1.15f,1.1f,1),highSun),Daylight),
+                    Color.Lerp(Color.Lerp(new Color(.16f,.25f,.44f),Color.Lerp(new Color(1.3f,.65f,.35f),new Color(1.15f,1.1f,1),highSun),Daylight),Color.Lerp(new Color(.12f,.16f,.23f),new Color(.7f,.74f,.8f),Daylight),overcast),
                     Color.Lerp(new Color(.16f,.24f,.4f),new Color(.72f,.83f,1),Daylight));
             if(grading)
             {
@@ -219,6 +222,7 @@ namespace MantaFlight
             // The volume applies its own slant-path solar extinction. Feeding the
             // already horizon-dimmed surface light here attenuated sunset twice.
             RayColor=sun.color*daylightIntensity;
+            RayStrength*=1-overcast*.85f;
         }
     }
 }

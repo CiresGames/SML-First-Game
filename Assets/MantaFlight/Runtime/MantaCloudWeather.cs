@@ -69,7 +69,13 @@ namespace MantaFlight
         public void TransitionTo(MantaCloudPreset preset, float seconds=45)
         {
             if (!preset) return;
-            if (!initialized) RestartCycle();
+            if (!initialized)
+            {
+                clouds=GetComponent<MantaCloudscape>();
+                var visible=clouds.CaptureAppearance();
+                RestartCycle();
+                clouds.SetAppearance(visible);
+            }
             automaticCycle=false; nextIndex=-1;
             Begin(preset,seconds);
         }
@@ -111,7 +117,9 @@ namespace MantaFlight
                     float step=Mathf.Min(seconds,Mathf.Max(0,duration-elapsed));
                     elapsed+=step; seconds-=step;
                     float t=Mathf.Clamp01(elapsed/duration);
-                    clouds.SetAppearance(CloudAppearance.Lerp(from,destination,t*t*(3-2*t)));
+                    // Zero speed AND acceleration at each end prevents a visible start/stop.
+                    float smooth=t*t*t*(t*(t*6-15)+10);
+                    clouds.SetAppearance(CloudAppearance.Lerp(from,destination,smooth));
                     if(elapsed<duration) return;
                     CurrentPreset=TargetPreset; index=nextIndex; elapsed=0; transitioning=false;
                     hold=index>=0 && index<(sequence?.Length ?? 0) && sequence[index]!=null

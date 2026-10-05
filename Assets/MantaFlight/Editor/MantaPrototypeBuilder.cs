@@ -86,7 +86,9 @@ namespace MantaFlight.Editor
             steer.AddBinding("<Gamepad>/leftStick", groups: "Gamepad");
             var lift = map.AddAction("Climb", InputActionType.Value); lift.expectedControlType = "Axis";
             lift.AddCompositeBinding("1DAxis").With("Positive", "<Keyboard>/space", groups: "KeyboardMouse").With("Negative", "<Keyboard>/leftCtrl", groups: "KeyboardMouse");
-            lift.AddBinding("<Gamepad>/rightStick/y", groups: "Gamepad");
+            var look = map.AddAction("Look", InputActionType.Value); look.expectedControlType = "Vector2";
+            look.AddBinding("<Mouse>/delta", groups: "KeyboardMouse");
+            look.AddBinding("<Gamepad>/rightStick", groups: "Gamepad");
             var mouse = map.AddAction("MouseSteering", InputActionType.Value); mouse.expectedControlType = "Vector2";
             mouse.AddBinding("<Mouse>/delta", groups: "KeyboardMouse");
             Add(map, "MouseEnable", "<Mouse>/rightButton", null);
@@ -96,7 +98,9 @@ namespace MantaFlight.Editor
             Add(map, "RollRight", "<Keyboard>/e", "<Gamepad>/rightShoulder");
             Add(map, "Turnaround", "<Keyboard>/x", "<Gamepad>/buttonEast");
             Add(map, "TightTurn", "<Keyboard>/leftAlt", "<Gamepad>/buttonSouth");
-            Add(map, "Dive", "<Keyboard>/v", "<Gamepad>/rightStickPress", true);
+            Add(map, "Dive", "<Keyboard>/v", null, true);
+            var lookBack=map.AddAction("LookBack",InputActionType.Button);
+            lookBack.AddBinding("<Gamepad>/rightStickPress",groups:"Gamepad");
             Add(map, "Reset", "<Keyboard>/r", "<Gamepad>/select");
             Add(map, "Menu", "<Keyboard>/escape", "<Gamepad>/start");
             Add(map, "HUD", "<Keyboard>/f1", null);
