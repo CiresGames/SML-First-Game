@@ -15,13 +15,13 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.48000002, g: 0.596, b: 0.68, a: 1}
+  m_FogColor: {r: 0.6828735, g: 0.62077254, b: 0.62795424, a: 1}
   m_FogMode: 3
   m_FogDensity: 0
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.37, g: 0.49, b: 0.63, a: 1}
-  m_AmbientEquatorColor: {r: 0.29144585, g: 0.32569268, b: 0.36852393, a: 1}
+  m_AmbientEquatorColor: {r: 0.33867356, g: 0.26665807, b: 0.23864774, a: 1}
   m_AmbientGroundColor: {r: 0.12, g: 0.14, b: 0.14, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
@@ -18609,8 +18609,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 1
-  m_Color: {r: 1, g: 0.8913249, b: 0.7655717, a: 1}
-  m_Intensity: 0.29700002
+  m_Color: {r: 1, g: 0.6079587, b: 0.37594324, a: 1}
+  m_Intensity: 1.9984059
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -18672,7 +18672,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 772663586}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.252684, y: -0.20906462, z: 0.056018695, w: 0.9430295}
+  m_LocalRotation: {x: 0.9695288, y: -0.02543975, z: 0.21493936, w: 0.114751294}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -28998,7 +28998,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1438840265}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.05601869, y: 0.9430296, z: 0.252684, w: 0.20906462}
+  m_LocalRotation: {x: -0.114751294, y: -0.21493934, z: -0.025439745, w: 0.9695288}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -30078,21 +30078,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shapeNoise: {fileID: 11700000, guid: 70c2adccd53fd45468d11570134863c2, type: 2}
   detailNoise: {fileID: 11700000, guid: 206e9646e82f94c249cda79e716d3f1d, type: 2}
-  coverage: 0.99
-  footprint: 1
-  thickness: 1
-  noiseScale: 0.65
-  erosion: 0.25
+  coverage: 0.09
+  footprint: 0.65
+  thickness: 0.3
+  noiseScale: 1.9
+  erosion: 0.8
   lenticular: 0
   layers: 0
-  sunlight: {r: 0.42, g: 0.46, b: 0.52, a: 1}
-  shadow: {r: 0.09, g: 0.12, b: 0.17, a: 1}
-  density: 1.9
-  wind: {x: 12, y: 0.03, z: 4}
-  evolution: 0.52
-  rain: 1
-  overcast: 1
-  thunder: 1
+  sunlight: {r: 1, g: 0.96, b: 0.86, a: 1}
+  shadow: {r: 0.55, g: 0.65, b: 0.76, a: 1}
+  density: 0.22
+  wind: {x: 1.8, y: 0.03, z: 0.6}
+  evolution: 0.18
+  rain: 0
+  overcast: 0
+  thunder: 0
   raySteps: 64
   distanceLod: 1
   frustumCulling: 1
@@ -35512,7 +35512,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b49fb689970c00c4b8cfba157751ed7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeOfDay: 8
+  timeOfDay: 17.1
   animate: 1
   cycleMinutes: 18
   sunAzimuth: -25

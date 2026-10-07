@@ -33,6 +33,7 @@ namespace MantaFlight.Rider.Editor
             Add(map,"Drop","<Keyboard>/k","<Gamepad>/dpad/down");
             Add(map,"Call","<Keyboard>/h","<Gamepad>/dpad/up");
             Add(map,"InvertPitch","<Keyboard>/i","<Gamepad>/dpad/right");
+            RiderInput.ConfigureOrders(map);
             File.WriteAllText(Root+"/Settings/RiderControls.inputactions",actions.ToJson());Object.DestroyImmediate(actions);
             AssetDatabase.ImportAsset(Root+"/Settings/RiderControls.inputactions");actions=AssetDatabase.LoadAssetAtPath<InputActionAsset>(Root+"/Settings/RiderControls.inputactions");
             var root=new GameObject("Rider Character");Undo.RegisterCreatedObjectUndo(root,"Install rider");root.layer=2;

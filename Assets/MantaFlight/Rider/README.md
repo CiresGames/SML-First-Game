@@ -9,7 +9,9 @@ Open `Assets/MantaFlight/Scenes/MantaFlight.unity` and enter Play Mode. The ride
 | Move / wingsuit bank and pitch | WASD | Left stick |
 | Camera / limited glide look | Mouse | Right stick |
 | Run | Left Shift | Left stick click |
-| Crouch (hold) | Left Ctrl | LB |
+| Crouch (hold) | Left Ctrl | LT |
+| Manta orders (dismounted; hold, choose, release) | Tab + arrows or mouse | LB + right stick |
+| Confirm / cancel Go There target | Click / right click (Enter / Backspace) | A / B |
 | Ground jump | Space | A |
 | Ground roll | Q | B |
 | Step off / contextual mount | F | X |
@@ -26,6 +28,15 @@ Mounted manta controls remain as before. Hold its brake (C / LT) when low and sl
 For immediate ground testing, use **Manta > Rider > Test on foot here (Play mode)**. It places the rider on the ground below the current location. This is a debug shortcut, not a gameplay action.
 
 ## States and feel
+
+The manta order wheel is available on foot and in the air while dismounted. Hold LB (Tab), choose with the right stick (arrows or mouse), then release to issue the highlighted order. Releasing in the centre or pressing B/right click cancels. Selecting does not move the camera or trigger jump/roll. Rider movement continues while choosing.
+
+- **Follow:** resume normal companion following.
+- **Stay:** brake and wait without resuming follow when the rider moves away.
+- **Go There:** aim the existing ground indicator, then confirm with A/click; invalid targets remain in preview. The manta makes its head-first landing approach and stays there.
+- **Come Here:** call to a nearby landing when grounded, or use the existing interception/remount behavior while airborne.
+
+Pause, focus loss, reset and remount close the wheel and cancel unconfirmed targeting. Existing H/D-pad-up call controls remain available. **Manta > Rider > Validate manta orders (Play mode)** tests real LB input, selection, action suppression and the four orders; its report is `Logs/MantaFlight/validation-orders.txt`.
 
 `Grounded` uses acceleration/deceleration, a turn-rate limit, a short heavy jump and a crouching capsule. Headroom is checked before standing. A roll locks movement until its configured duration, respects collisions and then enters its cooldown. Walking off an edge enters `Falling`; impact vertical and horizontal speeds choose a short landing recovery, a forced roll, or a hard-landing recovery.
 
@@ -81,6 +92,8 @@ All values below are in the existing exportable `RiderSettings`; pitch inversion
 - **Glide:** `pitchRate`, `bankRate`, `yawRate`, `pitchLimit`, `bankLimit`, `inputSmoothing` control response. `neutralTrimResponse` controls hands-off recovery (0 disables it); `stallHysteresis` prevents flicker between stall/recovery. Existing lift/drag, stall speed, gravity and target ratio remain in use.
 - **Mount / catch:** `callSpeed` should exceed the rider maximum speed. `callAcceleration`, `callTurnRate`, `predictionTime`, `approachResponse`, `scoopRadius`, `maximumRelativeSpeed`, `matchDistance` and `gracePeriod` govern catching. Existing timeout/retry limits still apply.
 - **Mount / companion:** `followDistance`, `followHeight`, `followResponse`, `followSway`, `followSwayPeriod` tune the trailing motion.
-- **Mount / landing:** `maximumLandingSlope`, `landingAimRange`, `landingProbeHeight`, `landingIndicatorRadius`, `landingTolerance` tune targeting. `hoverHeight` retains clearance above the landing surface; `landingOffset` also defines the fallback point ahead.
+- **Mount / landing:** `maximumLandingSlope`, `landingAimRange`, `landingProbeHeight`, `landingIndicatorRadius`, `landingTolerance` tune targeting. `hoverHeight` retains clearance above the landing surface; `landingOffset` also defines the fallback point ahead. Landing now follows the manta's nose through banked arcs instead of pulling it sideways/backwards toward the point. `landingTurnRate` (75 degrees/second by default, limited by `callTurnRate`) controls the approach turn radius; `landingFlareDistance` eases out bank near arrival. Speed decreases with remaining distance and required turning angle to avoid orbiting the target. The manta brakes and aligns with the surface normal only after arriving; its final heading follows the approach. Existing collision sweeps and call cancellation/timeout still apply.
 
 The new **Validate persistent glide, follow and landing** menu reproduces the former prolonged stall after a pull-out, exercises 30 seconds of glide, explicit jump/deploy, fast glide/fall catches, ground/air following, slope alignment, and the real hold/raycast/release path including wall rejection. `RiderLandingTarget` owns only aiming/feedback; `IMount.RequestLanding` owns the command. Its unlit translucent shader is in `Resources` so it is also available in player builds.
+
+**Manta > Rider > Validate head-first landing (Play mode)** independently checks front, left, rear and right approaches at 50/100 Hz, heading/velocity alignment, visible banked paths, arrival tolerance, cancellation and invalid surfaces. Its report is `Logs/MantaFlight/validation-head-first-landing.txt`.

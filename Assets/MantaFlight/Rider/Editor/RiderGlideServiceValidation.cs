@@ -8,6 +8,67 @@ namespace MantaFlight.Rider.Editor
 {
     public static class RiderGlideServiceValidation
     {
+        [MenuItem("Manta/Rider/Validate head-first landing (Play mode)")]
+        public static void RunLandingMenu() => Debug.Log(RunLanding());
+        public static string RunLanding()
+        {
+            if (!EditorApplication.isPlaying) throw new InvalidOperationException("Play mode required");
+            var r = Object.FindFirstObjectByType<RiderController>();
+            using var physics = new RiderPhysicsTestScope(r);
+            var report = new List<string>();
+            bool menu = r.mantaInput.MenuOpen;
+            var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var origin = new Vector3(-1000, 500, -1000);
+            ground.transform.position = origin - Vector3.up * .5f;
+            ground.transform.localScale = new Vector3(180, 1, 180);
+            Physics.SyncTransforms();
+            void Check(bool ok, string message)
+            { report.Add((ok ? "PASS " : "FAIL ") + message); if (!ok) throw new Exception(message); }
+            try
+            {
+                r.mantaInput.SetMenu(false);
+                foreach (float dt in new[] { .02f, .01f })
+                foreach (float yaw in new[] { 0f, 90f, 180f, 270f })
+                {
+                    r.PlaceForTest(origin + new Vector3(0, .05f, -10), Vector3.zero, RiderState.Grounded);
+                    Vector3 start = origin + new Vector3(0, 12, -30);
+                    Quaternion rotation = Quaternion.Euler(0, yaw, 0);
+                    r.mount.manta.SetExternalMotion(start, rotation, rotation * Vector3.forward * 20);
+                    string label = yaw + " degrees / " + (1 / dt).ToString("0") + " Hz";
+                    Check(r.mount.RequestLanding(origin + Vector3.forward * 5, Vector3.up), "Request accepted: " + label);
+                    Vector3 destination = r.mount.InterceptTarget;
+                    float maxCurve = 0, maxBank = 0, worstAlignment = 1, elapsed = 0;
+                    for (; elapsed < r.settings.mount.callTimeout + dt && r.mount.Calling; elapsed += dt)
+                    {
+                        var before = r.mount.manta.PhysicsPosition;
+                        r.mount.Tick(dt); RiderPhysicsTestScope.Step(dt); r.Tick(default, dt);
+                        var after = r.mount.manta.PhysicsPosition;
+                        if (Vector3.Distance(before, after) > Mathf.Max(20, r.settings.mount.callSpeed) * dt + .05f)
+                            throw new Exception("Landing teleported: " + label);
+                        Vector3 forward = r.mount.manta.PhysicsRotation * Vector3.forward;
+                        if (r.mount.Velocity.magnitude > 2)
+                            worstAlignment = Mathf.Min(worstAlignment, Vector3.Dot(forward, r.mount.Velocity.normalized));
+                        maxCurve = Mathf.Max(maxCurve, Vector3.ProjectOnPlane(after - start, (destination - start).normalized).magnitude);
+                        maxBank = Mathf.Max(maxBank, Mathf.Abs(r.mount.AutonomousBank));
+                    }
+                    Check(r.mount.Landed && Vector3.Distance(r.mount.manta.PhysicsPosition, destination) <= r.settings.mount.landingTolerance + .1f,
+                        "Arrived: " + label + " in " + elapsed.ToString("0.00") + "s, error " + Vector3.Distance(r.mount.manta.PhysicsPosition, destination).ToString("0.00") + "m");
+                    Check(worstAlignment > .7f, "Nose-first travel: " + label);
+                    if (yaw != 0) Check(maxCurve > 1 && maxBank > 5, "Curved, banked approach: " + label);
+                    Check(Vector3.Angle(r.mount.manta.PhysicsRotation * Vector3.up, Vector3.up) < 2, "Settles upright: " + label);
+                }
+                Check(!r.mount.RequestLanding(origin, Vector3.right), "Rejects a vertical landing surface");
+                r.mount.manta.SetExternalMotion(origin + new Vector3(0, 12, -30), Quaternion.identity, Vector3.zero);
+                r.mount.RequestLanding(origin, Vector3.up); r.mount.CancelCall();
+                Check(r.mount.Mode == MantaServiceState.Following, "Cancellation returns to companion follow");
+                return string.Join("\n", report);
+            }
+            finally
+            {
+                Object.DestroyImmediate(ground); r.mount.manta.ResetFlight(); r.mantaInput.SetMenu(menu);
+                Directory.CreateDirectory("Logs/MantaFlight"); File.WriteAllLines("Logs/MantaFlight/validation-head-first-landing.txt", report);
+            }
+        }
         [MenuItem("Manta/Rider/Validate persistent glide, follow and landing (Play mode)")]
         public static void RunMenu() => Debug.Log(Run());
         public static string Run()

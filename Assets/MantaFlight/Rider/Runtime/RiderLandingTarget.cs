@@ -13,7 +13,7 @@ namespace MantaFlight.Rider
         GameObject indicator;
         Material material;
 
-        public void Tick(bool held, bool released)
+        public void Tick(bool held, bool released, bool stayAfterLanding = false)
         {
             if (held)
             {
@@ -41,7 +41,7 @@ namespace MantaFlight.Rider
             {
                 // La destination du service reste fixe après validation, même si le joueur se déplace.
                 Valid = Valid && rider.mount.IsLandingSurfaceValid(Point, Normal);
-                if (Valid) Valid = rider.mount.RequestLanding(Point, Normal);
+                if (Valid) Valid = stayAfterLanding ? rider.mount.OrderGoThere(Point, Normal) : rider.mount.RequestLanding(Point, Normal);
                 Feedback = Valid ? "Landing confirmed" : "Landing cancelled";
                 Aiming = false; HideIndicator();
             }

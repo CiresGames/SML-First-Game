@@ -12,6 +12,7 @@ namespace MantaFlight.Rider
         public Camera view;
         public bool startMounted = true;
         public RiderLandingTarget LandingTarget { get; private set; }
+        public RiderCommandWheel CommandWheel { get; private set; }
         public RiderState State { get; private set; }
         public RiderGroundMotor Motor { get; private set; }
         public RiderGlideMotor Glide { get; private set; }
@@ -46,26 +47,33 @@ namespace MantaFlight.Rider
             LandingTarget = GetComponent<RiderLandingTarget>();
             if (LandingTarget == null) LandingTarget = gameObject.AddComponent<RiderLandingTarget>();
             LandingTarget.rider = this;
+            CommandWheel = GetComponent<RiderCommandWheel>();
+            if (CommandWheel == null) CommandWheel = gameObject.AddComponent<RiderCommandWheel>();
+            CommandWheel.rider = this;
         }
         void Start()
         {
             if (mount != null) { mount.rider = this; mount.manta.Respawned += ResetRider; }
             if (startMounted) ResetRider(); else SetState(RiderState.Falling);
         }
-        void OnDisable() { mountCollisions.Restore(); }
+        void OnDisable() { mountCollisions.Restore(); if (CommandWheel) CommandWheel.Cancel(); }
         void OnDestroy()
         { if (mount != null) mount.manta.Respawned -= ResetRider; if (settings != null) Destroy(settings); }
-        void Update() { if (!Paused) Tick(Input.Read(Time.deltaTime), Time.deltaTime); }
+        void Update() { if (!Paused) Tick(Input.Read(Time.deltaTime), Time.deltaTime); else CommandWheel.Cancel(); }
         public void Tick(RiderCommand command, float dt)
         {
             if (dt <= 0) return;
             mountCollisions.Tick(this, dt);
+            bool ordersOwnInput = CommandWheel.Handle(ref command);
             LookInput = command.look;
             LookBackHeld = command.lookBack;
             dt = Mathf.Min(dt,.05f); StateTime += dt; SinceDetach += dt;
             rollCooldown = Mathf.Max(0,rollCooldown-dt); LandingPulse = Mathf.MoveTowards(LandingPulse,0,dt / settings.camera.landingPulseDuration);
-            if (State == RiderState.Grounded) LandingTarget.Tick(command.callHeld, command.callReleased);
-            else LandingTarget.CancelPreview();
+            if (!ordersOwnInput)
+            {
+                if (State == RiderState.Grounded) LandingTarget.Tick(command.callHeld, command.callReleased);
+                else LandingTarget.CancelPreview();
+            }
             if (command.call && Airborne) mount.ToggleCall();
             if (Airborne) AirTime += dt;
             Vector3 forward = view == null ? transform.forward : view.transform.forward;
@@ -148,7 +156,8 @@ namespace MantaFlight.Rider
         {
             if(!Motor.Grounded) return;
             LandingPulse = Mathf.Clamp01(Motor.ImpactSpeed / settings.ground.hardLandingImpact);
-            AirTime = 0; mount.CancelCall();
+            AirTime = 0;
+            if (mount.Mode == MantaServiceState.Intercept || mount.Mode == MantaServiceState.Retry) mount.CancelCall();
             float angle = Mathf.Atan2(Motor.ImpactSpeed,Mathf.Max(.1f,Motor.HorizontalImpactSpeed)) * Mathf.Rad2Deg;
             if(Motor.ImpactSpeed >= settings.ground.hardLandingImpact)
             { landingDuration = settings.ground.hardLandingRecovery; SetState(RiderState.Landing); }
@@ -164,6 +173,7 @@ namespace MantaFlight.Rider
         public bool CanScoop => Airborne && !IgnoringMountCollisions && SinceDetach >= settings.mount.gracePeriod;
         public void BeginRemount()
         {
+            CommandWheel.Cancel();
             mountCollisions.Restore();
             transitionStart = transform.position; transitionRotation = transform.rotation; transitionVelocity = Motor.Velocity;
             Motor.Capsule.enabled = false; mount.BeginCatch(Motor.Velocity); SetState(RiderState.Remounting);
@@ -171,6 +181,7 @@ namespace MantaFlight.Rider
         void FollowSeat() { transform.SetPositionAndRotation(mount.Seat.position,mount.Seat.rotation); Motor.Velocity = mount.Velocity; }
         public void ResetRider()
         {
+            CommandWheel.Cancel();
             mountCollisions.Restore(); LandingTarget.CancelPreview(); mount.CancelCall(); Motor.Capsule.enabled = false; Motor.Velocity = Vector3.zero; GlidePose = 0; AirTime = SinceDetach = 0;
             mount.AttachRider(); SetState(RiderState.Mounted); FollowSeat();
         }

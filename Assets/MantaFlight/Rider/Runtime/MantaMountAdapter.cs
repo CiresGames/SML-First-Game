@@ -1,7 +1,7 @@
 using UnityEngine;
 namespace MantaFlight.Rider
 {
-    public enum MantaServiceState { Piloted, Hover, Idle, Intercept, Retry, Landing, Catch, Following }
+    public enum MantaServiceState { Piloted, Hover, Idle, Intercept, Retry, Landing, Catch, Following, Stay }
     [DefaultExecutionOrder(-20)]
     public sealed class MantaMountAdapter : MonoBehaviour, IMount
     {
@@ -28,6 +28,7 @@ namespace MantaFlight.Rider
         Quaternion landingRotation;
         float callTime, passTime, followTime, closestLandedDistance;
         bool landed, relativeValid;
+        bool stayAfterLanding;
         MantaInput input;
         MountFeel S => rider.settings.mount;
         void Awake() { input = manta.GetComponent<MantaInput>(); }
@@ -50,7 +51,7 @@ namespace MantaFlight.Rider
                 return;
             }
             manta.Paused = true;
-            if (Mode == MantaServiceState.Idle || Mode == MantaServiceState.Hover || Mode == MantaServiceState.Landing || Mode == MantaServiceState.Catch)
+            if (Mode == MantaServiceState.Idle || Mode == MantaServiceState.Hover || Mode == MantaServiceState.Catch || Mode == MantaServiceState.Stay)
                 AutonomousBank = Mathf.Lerp(AutonomousBank, 0, MantaFlightSettings.Damp(manta.settings.bankingSmoothing, dt));
             if (Mode == MantaServiceState.Hover)
             {
@@ -58,6 +59,11 @@ namespace MantaFlight.Rider
                 if (rider.Mounted && input.State.throttle > .1f) { AttachRider(); return; }
                 velocity = Vector3.MoveTowards(velocity, Vector3.zero, S.hoverDeceleration * dt); Move(velocity, dt);
                 return;
+            }
+            if (Mode == MantaServiceState.Stay)
+            {
+                velocity = Vector3.MoveTowards(velocity, Vector3.zero, S.hoverDeceleration * dt);
+                Move(velocity, dt); return;
             }
             if (Mode == MantaServiceState.Idle)
             {
@@ -81,12 +87,7 @@ namespace MantaFlight.Rider
             Vector3 desired;
             if (Mode == MantaServiceState.Landing)
             {
-                Vector3 error = InterceptTarget - Position;
-                float brakingSpeed = Mathf.Sqrt(2 * S.callAcceleration * error.magnitude);
-                desired = Vector3.ClampMagnitude(error * S.approachResponse, Mathf.Min(S.callSpeed, brakingSpeed));
-                Steer(desired, dt);
-                if (error.magnitude <= S.landingTolerance && velocity.magnitude <= S.dismountSpeed)
-                { landed = true; closestLandedDistance = Vector3.Distance(Position, rider.transform.position); Mode = MantaServiceState.Idle; }
+                ApproachLanding(dt);
                 return;
             }
             if (Mode == MantaServiceState.Retry)
@@ -186,14 +187,63 @@ namespace MantaFlight.Rider
             velocity = Vector3.MoveTowards(velocity, desired, S.callAcceleration * dt);
             Move(velocity, dt);
         }
+        void ApproachLanding(float dt)
+        {
+            Vector3 error = InterceptTarget - Position;
+            float distance = error.magnitude;
+            float acceleration = Mathf.Max(1, S.callAcceleration);
+            float turnRate = Mathf.Max(1, Mathf.Min(S.callTurnRate, S.landingTurnRate));
+            float tolerance = Mathf.Max(.1f, S.landingTolerance);
+            Quaternion heading = manta.PhysicsRotation;
+            bool settling = distance <= tolerance;
+            float targetBank = 0;
+            if (!settling)
+            {
+                Vector3 direction = error / distance;
+                Vector3 up = Mathf.Abs(Vector3.Dot(direction, LandingNormal)) > .95f ? heading * Vector3.up : LandingNormal;
+                Quaternion wanted = Quaternion.LookRotation(direction, up);
+                heading = Quaternion.RotateTowards(heading, wanted, turnRate * dt);
+                Vector3 forward = heading * Vector3.forward;
+                float angle = Vector3.Angle(forward, direction);
+                // Slow enough to turn inside the remaining distance. The nose leads the path,
+                // including for targets behind us; no direct attraction sideways/backwards.
+                float speed = Mathf.Min(S.callSpeed, Mathf.Sqrt(2 * acceleration * distance),
+                    distance * S.approachResponse, distance * turnRate * Mathf.Deg2Rad * .7f);
+                speed *= Mathf.Lerp(1, .3f, Mathf.InverseLerp(30, 150, angle));
+                velocity = Vector3.MoveTowards(velocity, forward * speed, acceleration * dt);
+                float turn = Vector3.SignedAngle(Vector3.ProjectOnPlane(Forward, LandingNormal),
+                    Vector3.ProjectOnPlane(direction, LandingNormal), LandingNormal);
+                targetBank = -Mathf.Clamp(turn / 60, -1, 1) * manta.settings.maximumBanking
+                    * Mathf.Clamp01(distance / Mathf.Max(1, S.landingFlareDistance));
+                // Remember the actual direction of arrival, not the direction at command time.
+                Vector3 surfaceForward = Vector3.ProjectOnPlane(forward, LandingNormal);
+                if (surfaceForward.sqrMagnitude > .01f)
+                    landingRotation = Quaternion.LookRotation(surfaceForward.normalized, LandingNormal);
+            }
+            else
+            {
+                // Flare in place only after the head-first approach has reached its tolerance.
+                velocity = Vector3.MoveTowards(velocity, Vector3.zero, acceleration * dt);
+                heading = Quaternion.RotateTowards(heading, landingRotation, turnRate * dt);
+            }
+            AutonomousBank = Mathf.Lerp(AutonomousBank, targetBank, MantaFlightSettings.Damp(manta.settings.bankingSmoothing, dt));
+            Move(velocity, dt, heading);
+            if (settling && velocity.magnitude < .1f && Quaternion.Angle(heading, landingRotation) < 2
+                && Mathf.Abs(AutonomousBank) < 2)
+            {
+                landed = true; closestLandedDistance = Vector3.Distance(Position, rider.transform.position);
+                Mode = stayAfterLanding ? MantaServiceState.Stay : MantaServiceState.Idle;
+            }
+        }
         void StartFollowing()
         {
+            stayAfterLanding = false;
             Mode = MantaServiceState.Following; landed = false; relativeValid = false;
             smoothFollowPosition = rider.transform.position;
             followForward = Vector3.ProjectOnPlane(Forward, Vector3.up).normalized;
             if (followForward.sqrMagnitude < .01f) followForward = Vector3.forward;
         }
-        void Move(Vector3 motion,float dt)
+        void Move(Vector3 motion,float dt, Quaternion? commandedHeading = null)
         {
             Vector3 position = Position;
             // La dérive résiduelle reste soumise au balayage de collision existant.
@@ -208,10 +258,11 @@ namespace MantaFlight.Rider
                 delta=Vector3.ProjectOnPlane(delta.normalized*(length-travel),hit.normal);
                 velocity=Vector3.ProjectOnPlane(velocity,hit.normal);
             }
-            Quaternion heading=manta.Heading;
-            if (Mode == MantaServiceState.Landing || (Mode == MantaServiceState.Idle && landed))
+            Quaternion heading=commandedHeading ?? manta.Heading;
+            // Landing already steered the nose before calculating thrust.
+            if (!commandedHeading.HasValue && (Mode == MantaServiceState.Idle || Mode == MantaServiceState.Stay) && landed)
                 heading = Quaternion.RotateTowards(heading, landingRotation, S.callTurnRate * dt);
-            else if(velocity.sqrMagnitude>1)
+            else if(!commandedHeading.HasValue && velocity.sqrMagnitude>1)
             {
                 Vector3 forward=velocity.normalized;
                 Vector3 up=Mathf.Abs(forward.y)>.96f ? heading*Vector3.up : Vector3.up;
@@ -275,18 +326,41 @@ namespace MantaFlight.Rider
         public bool RequestLanding(Vector3 point, Vector3 normal)
         {
             if (!IsLandingSurfaceValid(point, normal)) return false;
+            stayAfterLanding = false;
+            // Preserve current motion when taking ownership (the service velocity can be stale while piloted).
+            velocity = manta.Velocity;
             LandingNormal = normal.normalized;
             InterceptTarget = point + LandingNormal * S.hoverHeight;
-            Vector3 forward = Vector3.ProjectOnPlane(transform.forward, LandingNormal).normalized;
+            Vector3 forward = Vector3.ProjectOnPlane(InterceptTarget - Position, LandingNormal).normalized;
+            if (forward.sqrMagnitude < .01f) forward = Vector3.ProjectOnPlane(Forward, LandingNormal).normalized;
             if (forward.sqrMagnitude < .01f) forward = Vector3.ProjectOnPlane(rider.transform.forward, LandingNormal).normalized;
             landingRotation = Quaternion.LookRotation(forward, LandingNormal);
             Mode = MantaServiceState.Landing; landed = false; callTime = passTime = 0;
             manta.Paused = true; relativeValid = false; return true;
         }
+        public void OrderFollow() { velocity = manta.Velocity; StartFollowing(); manta.Paused = true; }
+        public void OrderStay()
+        {
+            velocity = manta.Velocity; Mode = MantaServiceState.Stay; stayAfterLanding = false;
+            relativeValid = false; manta.Paused = true; manta.GetComponent<MantaManeuvers>().Cancel();
+        }
+        public bool OrderGoThere(Vector3 point, Vector3 normal)
+        {
+            if (!RequestLanding(point, normal)) return false;
+            stayAfterLanding = true; return true;
+        }
+        public bool OrderComeHere()
+        {
+            if (Vector3.Distance(Position, rider.transform.position) > S.maximumCallDistance) return false;
+            velocity = manta.Velocity; stayAfterLanding = false;
+            CallToPosition(rider.transform.position, rider.Motor.Velocity, rider.Airborne);
+            return Calling;
+        }
         public void CancelCall() { if (Calling) StartFollowing(); }
         public void BeginCatch(Vector3 riderVelocity) { Mode = MantaServiceState.Catch; velocity = Vector3.Lerp(velocity, riderVelocity, .8f); }
         public void AttachRider()
         {
+            stayAfterLanding = false;
             float speed = Velocity.magnitude;
             Mode = MantaServiceState.Piloted; landed = false; AutonomousBank = 0; input.ControlEnabled = true; manta.Paused = false;
             manta.UpdateExternalVelocity(manta.Heading, manta.Heading * Vector3.forward * Mathf.Max(manta.settings.minimumSpeed, speed));

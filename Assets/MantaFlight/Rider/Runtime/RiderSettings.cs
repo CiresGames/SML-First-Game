@@ -129,6 +129,10 @@ namespace MantaFlight.Rider
         [Min(0)] public float followSway = 1.2f;
         [Min(.1f)] public float followSwayPeriod = 5;
         [Header("Ground landing target")]
+        [Tooltip("Maximum nose turn rate during a landing approach. Lower values produce wider flight arcs.")]
+        [Range(20, 180)] public float landingTurnRate = 75;
+        [Tooltip("Distance over which landing bank eases out before settling, in metres.")]
+        [Min(1)] public float landingFlareDistance = 10;
         [Tooltip("Maximum ground slope accepted for a landing, measured from world up.")]
         [Range(0,75)] public float maximumLandingSlope = 40;
         [Tooltip("Aim ray length and maximum target distance from the rider.")]

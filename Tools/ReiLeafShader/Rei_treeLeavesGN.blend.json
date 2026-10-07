@@ -1,0 +1,3526 @@
+{
+  "file": "C:\\Users\\alphe\\Downloads\\Rei_treeLeavesGN\\Rei_treeLeavesGN.blend",
+  "materials": [
+    {
+      "name": "Material Node Tree Versioning",
+      "nodes": [
+        {
+          "name": "Frame",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Material Output",
+          "type": "ShaderNodeOutputMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Displacement": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Thickness": "0.0"
+          }
+        },
+        {
+          "name": "Principled BSDF",
+          "type": "ShaderNodeBsdfPrincipled",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Base Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Metallic": "0.0",
+            "Roughness": "0.5",
+            "IOR": "1.5",
+            "Alpha": "1.0",
+            "Thin Wall": "False",
+            "Normal": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Weight": "0.0",
+            "Diffuse Roughness": "0.0",
+            "Subsurface Weight": "0.0",
+            "Subsurface Radius": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Subsurface Scale": "0.004999999888241291",
+            "Subsurface IOR": "1.399999976158142",
+            "Subsurface Anisotropy": "0.0",
+            "Specular IOR Level": "0.5",
+            "Specular Tint": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Anisotropic": "0.0",
+            "Anisotropic Rotation": "0.0",
+            "Tangent": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Transmission Weight": "0.0",
+            "Coat Weight": "0.0",
+            "Coat Roughness": "0.029999999329447746",
+            "Coat IOR": "1.5",
+            "Coat Tint": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Coat Normal": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Sheen Weight": "0.0",
+            "Sheen Roughness": "0.5",
+            "Sheen Tint": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Emission Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Emission Strength": "0.0",
+            "Thin Film Thickness": "0.0",
+            "Thin Film IOR": "1.3300000429153442"
+          }
+        },
+        {
+          "name": "Material Output.001",
+          "type": "ShaderNodeOutputMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Displacement": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Thickness": "0.0"
+          }
+        },
+        {
+          "name": "Diffuse BSDF",
+          "type": "ShaderNodeBsdfDiffuse",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Roughness": "0.0",
+            "Normal": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Weight": "0.0"
+          }
+        }
+      ],
+      "links": [
+        [
+          "Principled BSDF",
+          "BSDF",
+          "Material Output",
+          "Surface"
+        ],
+        [
+          "Diffuse BSDF",
+          "BSDF",
+          "Material Output.001",
+          "Surface"
+        ]
+      ]
+    },
+    {
+      "name": "Shader Nodetree",
+      "nodes": [
+        {
+          "name": "Frame.001",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Vector Math",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "ADD",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Attribute.001",
+          "type": "ShaderNodeAttribute",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Transparent BSDF",
+          "type": "ShaderNodeBsdfTransparent",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Weight": "0.0"
+          }
+        },
+        {
+          "name": "Mix Shader",
+          "type": "ShaderNodeMixShader",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Material Output",
+          "type": "ShaderNodeOutputMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Displacement": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Thickness": "0.0"
+          }
+        },
+        {
+          "name": "Attribute",
+          "type": "ShaderNodeAttribute",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Noise Texture.001",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "2.3000001907348633",
+            "Detail": "2.0",
+            "Roughness": "0.5",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "1.9999998807907104"
+          }
+        },
+        {
+          "name": "Mix.002",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Noise Texture.002",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "5.899999618530273",
+            "Detail": "2.0",
+            "Roughness": "0.5",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.3999999761581421"
+          }
+        },
+        {
+          "name": "Vector Math.001",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Group.002",
+          "type": "ShaderNodeGroup",
+          "image": null,
+          "group": "LeavesCol",
+          "operation": null,
+          "inputs": {
+            "Normal": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Group",
+          "type": "ShaderNodeGroup",
+          "image": null,
+          "group": "LeavesSmallWindUV",
+          "operation": null,
+          "inputs": {
+            "Scale Wind": "1.5",
+            "Wind Strength": "8.0",
+            "Wind Resist Base": "0.30000001192092896",
+            "W": "0.0"
+          }
+        },
+        {
+          "name": "Image Texture",
+          "type": "ShaderNodeTexImage",
+          "image": "//textures\\TreeLeaves01.png",
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Material Output.001",
+          "type": "ShaderNodeOutputMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Displacement": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Thickness": "0.0"
+          }
+        },
+        {
+          "name": "Mix Shader.001",
+          "type": "ShaderNodeMixShader",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Light Path",
+          "type": "ShaderNodeLightPath",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Transparent BSDF.001",
+          "type": "ShaderNodeBsdfTransparent",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Weight": "0.0"
+          }
+        }
+      ],
+      "links": [
+        [
+          "Transparent BSDF",
+          "BSDF",
+          "Mix Shader",
+          "Shader"
+        ],
+        [
+          "Image Texture",
+          "Color",
+          "Mix Shader",
+          "Factor"
+        ],
+        [
+          "Mix Shader",
+          "Shader",
+          "Material Output",
+          "Surface"
+        ],
+        [
+          "Vector Math",
+          "Vector",
+          "Image Texture",
+          "Vector"
+        ],
+        [
+          "Attribute.001",
+          "Vector",
+          "Vector Math",
+          "Vector"
+        ],
+        [
+          "Group",
+          "Vector",
+          "Vector Math",
+          "Vector"
+        ],
+        [
+          "Vector Math.001",
+          "Vector",
+          "Group.002",
+          "Normal"
+        ],
+        [
+          "Group.002",
+          "Color",
+          "Mix Shader",
+          "Shader"
+        ],
+        [
+          "Attribute",
+          "Vector",
+          "Vector Math.001",
+          "Vector"
+        ],
+        [
+          "Mix.002",
+          "Result",
+          "Vector Math.001",
+          "Vector"
+        ],
+        [
+          "Noise Texture.002",
+          "Color",
+          "Mix.002",
+          "B"
+        ],
+        [
+          "Noise Texture.001",
+          "Color",
+          "Mix.002",
+          "A"
+        ],
+        [
+          "Mix Shader",
+          "Shader",
+          "Mix Shader.001",
+          "Shader"
+        ],
+        [
+          "Mix Shader.001",
+          "Shader",
+          "Material Output.001",
+          "Surface"
+        ],
+        [
+          "Light Path",
+          "Is Shadow Ray",
+          "Mix Shader.001",
+          "Factor"
+        ],
+        [
+          "Transparent BSDF.001",
+          "BSDF",
+          "Mix Shader.001",
+          "Shader"
+        ]
+      ]
+    },
+    {
+      "name": "Shader Nodetree",
+      "nodes": [
+        {
+          "name": "Frame",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Mix",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Geometry",
+          "type": "ShaderNodeNewGeometry",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Normal",
+          "type": "ShaderNodeNormal",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Normal": "<Vector (0.0000, 0.0000, 1.0000)>"
+          }
+        },
+        {
+          "name": "Material Output",
+          "type": "ShaderNodeOutputMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Displacement": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Thickness": "0.0"
+          }
+        },
+        {
+          "name": "Group",
+          "type": "ShaderNodeGroup",
+          "image": null,
+          "group": "LeavesCol",
+          "operation": null,
+          "inputs": {
+            "Normal": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        }
+      ],
+      "links": [
+        [
+          "Group",
+          "Color",
+          "Material Output",
+          "Surface"
+        ],
+        [
+          "Geometry",
+          "Normal",
+          "Mix",
+          "A"
+        ],
+        [
+          "Normal",
+          "Normal",
+          "Mix",
+          "B"
+        ],
+        [
+          "Mix",
+          "Result",
+          "Group",
+          "Normal"
+        ]
+      ]
+    },
+    {
+      "name": "Shader Nodetree",
+      "nodes": [
+        {
+          "name": "Frame.003",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.008",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.007",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.004",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.002",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.001",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Gradient Texture",
+          "type": "ShaderNodeTexGradient",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Map Range.004",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Mapping.002",
+          "type": "ShaderNodeMapping",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Location": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Rotation": "<Euler (x=0.0000, y=1.5708, z=0.0000), order='XYZ'>",
+            "Scale": "<Vector (1.0000, 1.0000, 1.0000)>"
+          }
+        },
+        {
+          "name": "Texture Coordinate.003",
+          "type": "ShaderNodeTexCoord",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Diffuse BSDF",
+          "type": "ShaderNodeBsdfDiffuse",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Roughness": "0.0",
+            "Normal": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Weight": "0.0"
+          }
+        },
+        {
+          "name": "ColorRamp.004",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Mix.011",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Mix.010",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Map Range.003",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Shader to RGB",
+          "type": "ShaderNodeShaderToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Separate Color.001",
+          "type": "ShaderNodeSeparateColor",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Mix.006",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Reroute",
+          "type": "NodeReroute",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Input": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Material Output",
+          "type": "ShaderNodeOutputMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Displacement": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Thickness": "0.0"
+          }
+        },
+        {
+          "name": "Noise Texture",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "83.30000305175781",
+            "Detail": "15.0",
+            "Roughness": "0.5",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Map Range",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Mix",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Musgrave Texture.003",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "6.909998893737793",
+            "Detail": "11.800000190734863",
+            "Roughness": "0.43527525663375854",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Noise Texture.002",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "1.000000238418579",
+            "Detail": "0.0",
+            "Roughness": "0.5",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Map Range.001",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Mix.008",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Texture Coordinate.002",
+          "type": "ShaderNodeTexCoord",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Map Range.002",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Separate Color",
+          "type": "ShaderNodeSeparateColor",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Mix.009",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "ColorRamp.005",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Musgrave Texture.001",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "4.329999923706055",
+            "Detail": "7.100000381469727",
+            "Roughness": "0.025980215519666672",
+            "Lacunarity": "11.399999618530273",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "ColorRamp.003",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "ColorRamp.002",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Musgrave Texture",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "13.699999809265137",
+            "Detail": "7.100000381469727",
+            "Roughness": "0.3535533845424652",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Texture Coordinate.001",
+          "type": "ShaderNodeTexCoord",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Object Info.001",
+          "type": "ShaderNodeObjectInfo",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Mapping.001",
+          "type": "ShaderNodeMapping",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Location": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Rotation": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "Scale": "<Vector (1.4000, 0.4000, 0.4000)>"
+          }
+        },
+        {
+          "name": "Mix.013",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Hue Saturation Value.003",
+          "type": "ShaderNodeHueSaturation",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Hue": "0.7099999785423279",
+            "Saturation": "0.8999999761581421",
+            "Value": "0.429999977350235",
+            "Factor": "1.0",
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Mix.007",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Texture Coordinate",
+          "type": "ShaderNodeTexCoord",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Noise Texture.001",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "30.0",
+            "Detail": "0.0",
+            "Roughness": "0.0",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Mix.001",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Mix.004",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Mix.005",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "ColorRamp",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Hue Saturation Value",
+          "type": "ShaderNodeHueSaturation",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Hue": "0.5",
+            "Saturation": "1.1100000143051147",
+            "Value": "1.529999852180481",
+            "Factor": "1.0",
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Hue Saturation Value.001",
+          "type": "ShaderNodeHueSaturation",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Hue": "0.4399999678134918",
+            "Saturation": "0.9500001072883606",
+            "Value": "1.119999885559082",
+            "Factor": "1.0",
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Mix.003",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Mapping",
+          "type": "ShaderNodeMapping",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Location": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Rotation": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "Scale": "<Vector (1.0000, 1.0000, 1.0000)>"
+          }
+        },
+        {
+          "name": "ColorRamp.001",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Voronoi Texture.001",
+          "type": "ShaderNodeTexVoronoi",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "42.39999771118164",
+            "Detail": "0.0",
+            "Roughness": "0.5",
+            "Lacunarity": "2.0",
+            "Smoothness": "0.32499998807907104",
+            "Exponent": "0.5",
+            "Randomness": "0.5833333730697632"
+          }
+        },
+        {
+          "name": "Mix.002",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Voronoi Texture",
+          "type": "ShaderNodeTexVoronoi",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "12.600006103515625",
+            "Detail": "0.0",
+            "Roughness": "0.5",
+            "Lacunarity": "2.0",
+            "Smoothness": "0.32499998807907104",
+            "Exponent": "0.5",
+            "Randomness": "0.6833333373069763"
+          }
+        }
+      ],
+      "links": [
+        [
+          "Mix.002",
+          "Result",
+          "ColorRamp",
+          "Factor"
+        ],
+        [
+          "Mapping",
+          "Vector",
+          "Voronoi Texture",
+          "Vector"
+        ],
+        [
+          "Map Range",
+          "Result",
+          "Mix",
+          "A"
+        ],
+        [
+          "Mix",
+          "Result",
+          "Voronoi Texture",
+          "Smoothness"
+        ],
+        [
+          "Noise Texture",
+          "Color",
+          "Map Range",
+          "Value"
+        ],
+        [
+          "Noise Texture.001",
+          "Color",
+          "Mix.001",
+          "A"
+        ],
+        [
+          "Mix.001",
+          "Result",
+          "Mapping",
+          "Scale"
+        ],
+        [
+          "Mapping",
+          "Vector",
+          "Voronoi Texture.001",
+          "Vector"
+        ],
+        [
+          "Mix",
+          "Result",
+          "Voronoi Texture.001",
+          "Smoothness"
+        ],
+        [
+          "Voronoi Texture",
+          "Color",
+          "Mix.002",
+          "A"
+        ],
+        [
+          "Voronoi Texture.001",
+          "Color",
+          "Mix.002",
+          "B"
+        ],
+        [
+          "Voronoi Texture.001",
+          "Color",
+          "ColorRamp.001",
+          "Factor"
+        ],
+        [
+          "ColorRamp",
+          "Color",
+          "Mix.003",
+          "A"
+        ],
+        [
+          "ColorRamp.001",
+          "Color",
+          "Mix.003",
+          "B"
+        ],
+        [
+          "Mix.003",
+          "Result",
+          "Mix.004",
+          "A"
+        ],
+        [
+          "ColorRamp.002",
+          "Color",
+          "Mix.004",
+          "Factor"
+        ],
+        [
+          "Musgrave Texture",
+          "Factor",
+          "ColorRamp.002",
+          "Factor"
+        ],
+        [
+          "Musgrave Texture.001",
+          "Factor",
+          "ColorRamp.003",
+          "Factor"
+        ],
+        [
+          "Mix.004",
+          "Result",
+          "Mix.005",
+          "A"
+        ],
+        [
+          "ColorRamp.003",
+          "Color",
+          "Mix.005",
+          "Factor"
+        ],
+        [
+          "Mapping.001",
+          "Vector",
+          "Musgrave Texture.001",
+          "Vector"
+        ],
+        [
+          "Mapping.001",
+          "Vector",
+          "Musgrave Texture",
+          "Vector"
+        ],
+        [
+          "Object Info.001",
+          "Location",
+          "Mapping.001",
+          "Location"
+        ],
+        [
+          "Mix.003",
+          "Result",
+          "Hue Saturation Value",
+          "Color"
+        ],
+        [
+          "Hue Saturation Value",
+          "Color",
+          "Mix.004",
+          "B"
+        ],
+        [
+          "Mix.004",
+          "Result",
+          "Hue Saturation Value.001",
+          "Color"
+        ],
+        [
+          "Hue Saturation Value.001",
+          "Color",
+          "Mix.005",
+          "B"
+        ],
+        [
+          "Mix.005",
+          "Result",
+          "Mix.007",
+          "A"
+        ],
+        [
+          "Mix.009",
+          "Result",
+          "ColorRamp.005",
+          "Factor"
+        ],
+        [
+          "Mapping.001",
+          "Vector",
+          "Musgrave Texture.003",
+          "Vector"
+        ],
+        [
+          "ColorRamp.005",
+          "Color",
+          "Mix.007",
+          "Factor"
+        ],
+        [
+          "Musgrave Texture.003",
+          "Factor",
+          "Mix.008",
+          "A"
+        ],
+        [
+          "Map Range.001",
+          "Result",
+          "Mix.008",
+          "Factor"
+        ],
+        [
+          "Noise Texture.002",
+          "Color",
+          "Map Range.001",
+          "Value"
+        ],
+        [
+          "Texture Coordinate.002",
+          "Object",
+          "Separate Color",
+          "Color"
+        ],
+        [
+          "Separate Color",
+          "Blue",
+          "Map Range.002",
+          "Value"
+        ],
+        [
+          "Mix.008",
+          "Result",
+          "Mix.009",
+          "A"
+        ],
+        [
+          "Map Range.002",
+          "Result",
+          "Mix.009",
+          "B"
+        ],
+        [
+          "Texture Coordinate",
+          "Object",
+          "Mapping",
+          "Vector"
+        ],
+        [
+          "Texture Coordinate.001",
+          "Object",
+          "Mapping.001",
+          "Vector"
+        ],
+        [
+          "Gradient Texture",
+          "Color",
+          "Map Range.004",
+          "Value"
+        ],
+        [
+          "Mapping.002",
+          "Vector",
+          "Gradient Texture",
+          "Vector"
+        ],
+        [
+          "Texture Coordinate.003",
+          "Generated",
+          "Mapping.002",
+          "Vector"
+        ],
+        [
+          "Mix.007",
+          "Result",
+          "Mix.013",
+          "A"
+        ],
+        [
+          "Map Range.004",
+          "Result",
+          "Mix.013",
+          "Factor"
+        ],
+        [
+          "Mix.007",
+          "Result",
+          "Hue Saturation Value.003",
+          "Color"
+        ],
+        [
+          "Hue Saturation Value.003",
+          "Color",
+          "Mix.013",
+          "B"
+        ],
+        [
+          "ColorRamp.004",
+          "Color",
+          "Mix.011",
+          "A"
+        ],
+        [
+          "ColorRamp.004",
+          "Color",
+          "Map Range.003",
+          "Value"
+        ],
+        [
+          "Map Range.003",
+          "Result",
+          "Mix.006",
+          "Factor"
+        ],
+        [
+          "Mix.011",
+          "Result",
+          "Mix.006",
+          "A"
+        ],
+        [
+          "Mix.010",
+          "Result",
+          "Mix.006",
+          "B"
+        ],
+        [
+          "Diffuse BSDF",
+          "BSDF",
+          "Shader to RGB",
+          "Shader"
+        ],
+        [
+          "Shader to RGB",
+          "Color",
+          "Separate Color.001",
+          "Color"
+        ],
+        [
+          "Separate Color.001",
+          "Red",
+          "ColorRamp.004",
+          "Factor"
+        ],
+        [
+          "Reroute",
+          "Output",
+          "Mix.010",
+          "A"
+        ],
+        [
+          "Reroute",
+          "Output",
+          "Mix.011",
+          "B"
+        ],
+        [
+          "Mix.006",
+          "Result",
+          "Material Output",
+          "Surface"
+        ],
+        [
+          "Mix.013",
+          "Result",
+          "Reroute",
+          "Input"
+        ]
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "name": "LeavesCol",
+      "nodes": [
+        {
+          "name": "Frame.002",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.003",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.001",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.005",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.004",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Output",
+          "type": "NodeGroupOutput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Mix.001",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Noise Texture",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "0.5",
+            "Detail": "1.0",
+            "Roughness": "0.5",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Map Range",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Mix.004",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Mix.002",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Mix",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Separate Color",
+          "type": "ShaderNodeSeparateColor",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "ColorRamp",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Shader to RGB",
+          "type": "ShaderNodeShaderToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Diffuse BSDF",
+          "type": "ShaderNodeBsdfDiffuse",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Roughness": "0.0",
+            "Normal": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Weight": "0.0"
+          }
+        },
+        {
+          "name": "Map Range.001",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Vector Math",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "ADD",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Hue Saturation Value",
+          "type": "ShaderNodeHueSaturation",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Hue": "0.5299999713897705",
+            "Saturation": "2.0",
+            "Value": "1.4700000286102295",
+            "Factor": "1.0",
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Mix.005",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "ColorRamp.001",
+          "type": "ShaderNodeValToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "0.5"
+          }
+        },
+        {
+          "name": "Separate Color.001",
+          "type": "ShaderNodeSeparateColor",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Shader to RGB.001",
+          "type": "ShaderNodeShaderToRGB",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Diffuse BSDF.001",
+          "type": "ShaderNodeBsdfDiffuse",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>",
+            "Roughness": "0.0",
+            "Normal": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Weight": "0.0"
+          }
+        },
+        {
+          "name": "Vector Math.001",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "ADD",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Mix.003",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        }
+      ],
+      "links": [
+        [
+          "Map Range",
+          "Result",
+          "Mix.001",
+          "Factor"
+        ],
+        [
+          "Noise Texture",
+          "Factor",
+          "Map Range",
+          "Value"
+        ],
+        [
+          "Mix.004",
+          "Result",
+          "Group Output",
+          "Color"
+        ],
+        [
+          "ColorRamp",
+          "Color",
+          "Mix",
+          "A"
+        ],
+        [
+          "Mix.001",
+          "Result",
+          "Mix",
+          "B"
+        ],
+        [
+          "Group Input",
+          "Normal",
+          "Vector Math",
+          "Vector"
+        ],
+        [
+          "ColorRamp",
+          "Color",
+          "Map Range.001",
+          "Value"
+        ],
+        [
+          "Map Range.001",
+          "Result",
+          "Mix.002",
+          "Factor"
+        ],
+        [
+          "Mix.001",
+          "Result",
+          "Mix.003",
+          "A"
+        ],
+        [
+          "Mix",
+          "Result",
+          "Mix.002",
+          "A"
+        ],
+        [
+          "Mix.003",
+          "Result",
+          "Mix.002",
+          "B"
+        ],
+        [
+          "Group Input",
+          "Normal",
+          "Vector Math.001",
+          "Vector"
+        ],
+        [
+          "Diffuse BSDF",
+          "BSDF",
+          "Shader to RGB",
+          "Shader"
+        ],
+        [
+          "Shader to RGB",
+          "Color",
+          "Separate Color",
+          "Color"
+        ],
+        [
+          "Separate Color",
+          "Red",
+          "ColorRamp",
+          "Factor"
+        ],
+        [
+          "Diffuse BSDF.001",
+          "BSDF",
+          "Shader to RGB.001",
+          "Shader"
+        ],
+        [
+          "Shader to RGB.001",
+          "Color",
+          "Separate Color.001",
+          "Color"
+        ],
+        [
+          "Vector Math.001",
+          "Vector",
+          "Diffuse BSDF.001",
+          "Normal"
+        ],
+        [
+          "Mix.002",
+          "Result",
+          "Mix.004",
+          "A"
+        ],
+        [
+          "Separate Color.001",
+          "Red",
+          "ColorRamp.001",
+          "Factor"
+        ],
+        [
+          "Mix.005",
+          "Result",
+          "Hue Saturation Value",
+          "Color"
+        ],
+        [
+          "Hue Saturation Value",
+          "Color",
+          "Mix.004",
+          "B"
+        ],
+        [
+          "ColorRamp.001",
+          "Color",
+          "Mix.005",
+          "A"
+        ],
+        [
+          "Mix.001",
+          "Result",
+          "Mix.005",
+          "B"
+        ],
+        [
+          "Vector Math",
+          "Vector",
+          "Diffuse BSDF",
+          "Normal"
+        ]
+      ]
+    },
+    {
+      "name": "LeavesSmallWindUV",
+      "nodes": [
+        {
+          "name": "Mapping.001",
+          "type": "ShaderNodeMapping",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Location": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Rotation": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "Scale": "<Vector (1.0000, 1.0000, 1.0000)>"
+          }
+        },
+        {
+          "name": "Group Input",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Texture Coordinate.001",
+          "type": "ShaderNodeTexCoord",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Attribute.001",
+          "type": "ShaderNodeAttribute",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Separate RGB.001",
+          "type": "ShaderNodeSeparateColor",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Color": "<bpy_float[4], NodeSocketColor.default_value>"
+          }
+        },
+        {
+          "name": "Noise Texture",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "68.9000015258789",
+            "Scale": "1.1899999380111694",
+            "Detail": "0.0",
+            "Roughness": "0.0",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Map Range",
+          "type": "ShaderNodeMapRange",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "1.0",
+            "From Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "From Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Min": "<bpy_float[3], NodeSocketVector.default_value>",
+            "To Max": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Steps": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Mix.001",
+          "type": "ShaderNodeMix",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Factor": "<bpy_float[3], NodeSocketVectorFactor.default_value>",
+            "A": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "B": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>"
+          }
+        },
+        {
+          "name": "Vector Math.001",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "SCALE",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "-0.10000000149011612"
+          }
+        },
+        {
+          "name": "Group Output",
+          "type": "NodeGroupOutput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Combine RGB.001",
+          "type": "ShaderNodeCombineColor",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Red": "0.0",
+            "Green": "0.0",
+            "Blue": "0.0"
+          }
+        }
+      ],
+      "links": [
+        [
+          "Vector Math.001",
+          "Vector",
+          "Group Output",
+          "Vector"
+        ],
+        [
+          "Mapping.001",
+          "Vector",
+          "Noise Texture",
+          "Vector"
+        ],
+        [
+          "Noise Texture",
+          "Factor",
+          "Mix.001",
+          "B"
+        ],
+        [
+          "Texture Coordinate.001",
+          "Object",
+          "Mapping.001",
+          "Vector"
+        ],
+        [
+          "Group Input",
+          "Scale Wind",
+          "Noise Texture",
+          "Scale"
+        ],
+        [
+          "Map Range",
+          "Result",
+          "Mix.001",
+          "Factor"
+        ],
+        [
+          "Group Input",
+          "W",
+          "Noise Texture",
+          "W"
+        ],
+        [
+          "Group Input",
+          "Wind Strength",
+          "Map Range",
+          "To Max"
+        ],
+        [
+          "Group Input",
+          "Wind Resist Base",
+          "Map Range",
+          "From Min"
+        ],
+        [
+          "Attribute.001",
+          "Color",
+          "Separate RGB.001",
+          "Color"
+        ],
+        [
+          "Separate RGB.001",
+          "Blue",
+          "Combine RGB.001",
+          "Blue"
+        ],
+        [
+          "Separate RGB.001",
+          "Green",
+          "Combine RGB.001",
+          "Green"
+        ],
+        [
+          "Separate RGB.001",
+          "Green",
+          "Map Range",
+          "Value"
+        ],
+        [
+          "Separate RGB.001",
+          "Red",
+          "Mix.001",
+          "A"
+        ],
+        [
+          "Mix.001",
+          "Result",
+          "Combine RGB.001",
+          "Red"
+        ],
+        [
+          "Combine RGB.001",
+          "Color",
+          "Vector Math.001",
+          "Vector"
+        ]
+      ]
+    },
+    {
+      "name": "LeavesSphereGN",
+      "nodes": [
+        {
+          "name": "Frame.004",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.001",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.003",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.005",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.006",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.002",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.007",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Instance on Points",
+          "type": "GeometryNodeInstanceOnPoints",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Pick Instance": "False",
+            "Instance Index": "0",
+            "Rotation": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "Scale": "<Vector (1.0000, 1.0000, 1.0000)>"
+          }
+        },
+        {
+          "name": "Capture Attribute",
+          "type": "GeometryNodeCaptureAttribute",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Value": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Normal",
+          "type": "GeometryNodeInputNormal",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Reroute",
+          "type": "NodeReroute",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Math.001",
+          "type": "ShaderNodeMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY_ADD",
+          "inputs": {
+            "Value": "0.0"
+          }
+        },
+        {
+          "name": "Math",
+          "type": "ShaderNodeMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Value": "0.5"
+          }
+        },
+        {
+          "name": "Random Value",
+          "type": "FunctionNodeRandomValue",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Min": "0.30000001192092896",
+            "Max": "1.2000000476837158",
+            "ID": "0",
+            "Seed": "0"
+          }
+        },
+        {
+          "name": "Subdivision Surface",
+          "type": "GeometryNodeSubdivisionSurface",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Level": "0",
+            "Edge Crease": "0.0",
+            "Vertex Crease": "0.0",
+            "Limit Surface": "False",
+            "Quality": "3",
+            "UV Smooth": "Keep Boundaries",
+            "Boundary Smooth": "All"
+          }
+        },
+        {
+          "name": "Distribute Points on Faces",
+          "type": "GeometryNodeDistributePointsOnFaces",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Distance Min": "0.0",
+            "Density Max": "10.0",
+            "Density": "10.0",
+            "Density Factor": "1.0",
+            "Seed": "0"
+          }
+        },
+        {
+          "name": "Scale Elements.001",
+          "type": "GeometryNodeScaleElements",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Scale": "1.0",
+            "Center": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Scale Mode": "Uniform",
+            "Axis": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Object Info",
+          "type": "GeometryNodeObjectInfo",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Object": "<bpy_struct, Object(\"Leaf\") at 0x00000279E19B0F20>",
+            "As Instance": "False"
+          }
+        },
+        {
+          "name": "Translate Instances",
+          "type": "GeometryNodeTranslateInstances",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Translation": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Local Space": "True"
+          }
+        },
+        {
+          "name": "Random Value.002",
+          "type": "FunctionNodeRandomValue",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Min": "0.0",
+            "Max": "0.5",
+            "ID": "0",
+            "Seed": "0"
+          }
+        },
+        {
+          "name": "Math.002",
+          "type": "ShaderNodeMath",
+          "image": null,
+          "group": null,
+          "operation": "ADD",
+          "inputs": {
+            "Value": "0.5"
+          }
+        },
+        {
+          "name": "Set Material",
+          "type": "GeometryNodeSetMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Material": "<bpy_struct, Material(\"Leaf\") at 0x00000279E1C21320>"
+          }
+        },
+        {
+          "name": "Join Geometry",
+          "type": "GeometryNodeJoinGeometry",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Rotate Instances",
+          "type": "GeometryNodeRotateInstances",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Rotation": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "Pivot Point": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Local Space": "True"
+          }
+        },
+        {
+          "name": "Set Material.001",
+          "type": "GeometryNodeSetMaterial",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Material": "<bpy_struct, Material(\"LeavesSphere\") at 0x00000279E1C20E20>"
+          }
+        },
+        {
+          "name": "Switch",
+          "type": "GeometryNodeSwitch",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Switch": "False"
+          }
+        },
+        {
+          "name": "Group Output",
+          "type": "NodeGroupOutput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Sphere Normals": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Realize Instances.001",
+          "type": "GeometryNodeRealizeInstances",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Realize All": "True",
+            "Depth": "0"
+          }
+        },
+        {
+          "name": "Group.002",
+          "type": "GeometryNodeGroup",
+          "image": null,
+          "group": "LeavesWind",
+          "operation": null,
+          "inputs": {
+            "Wind Speed": "8.079999923706055",
+            "Wind Mvt Range": "1.0",
+            "Wind Noise Scale": "0.31999993324279785",
+            "Wind Noise Detail": "1.5"
+          }
+        },
+        {
+          "name": "Scale Elements",
+          "type": "GeometryNodeScaleElements",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Scale": "1.0",
+            "Center": "<Vector (0.0000, 0.0000, 0.0000)>",
+            "Scale Mode": "Uniform",
+            "Axis": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Group",
+          "type": "GeometryNodeGroup",
+          "image": null,
+          "group": "LeavesWind",
+          "operation": null,
+          "inputs": {
+            "Wind Speed": "8.079999923706055",
+            "Wind Mvt Range": "0.5",
+            "Wind Noise Scale": "0.31999993324279785",
+            "Wind Noise Detail": "1.5"
+          }
+        },
+        {
+          "name": "Vector Math.001",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Vector Math",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Align Euler to Vector",
+          "type": "FunctionNodeAlignEulerToVector",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Rotation": "<Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>",
+            "Factor": "1.0",
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>"
+          }
+        },
+        {
+          "name": "Random Value.001",
+          "type": "FunctionNodeRandomValue",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Min": "0.0",
+            "Max": "360.0",
+            "ID": "0",
+            "Seed": "0"
+          }
+        },
+        {
+          "name": "Position",
+          "type": "GeometryNodeInputPosition",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Object Info.001",
+          "type": "GeometryNodeObjectInfo",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Object": "<bpy_struct, Object(\"TreeWind_empty\") at 0x00000279E195EB20>",
+            "As Instance": "False"
+          }
+        },
+        {
+          "name": "Vector Math.002",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "ADD",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Noise Texture",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "1.0",
+            "Detail": "0.0",
+            "Roughness": "0.0",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Math.003",
+          "type": "ShaderNodeMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Value": "0.5"
+          }
+        },
+        {
+          "name": "Combine XYZ",
+          "type": "ShaderNodeCombineXYZ",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "X": "0.0",
+            "Y": "0.0",
+            "Z": "0.0"
+          }
+        },
+        {
+          "name": "Group Input.005",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input.003",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input.002",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input.004",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input.006",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input.001",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group.001",
+          "type": "GeometryNodeGroup",
+          "image": null,
+          "group": "LeavesWind",
+          "operation": null,
+          "inputs": {
+            "Wind Speed": "8.079999923706055",
+            "Wind Mvt Range": "0.5",
+            "Wind Noise Scale": "0.31999993324279785",
+            "Wind Noise Detail": "1.5"
+          }
+        },
+        {
+          "name": "Clamp",
+          "type": "ShaderNodeClamp",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "0.0",
+            "Min": "0.0",
+            "Max": "11.0"
+          }
+        },
+        {
+          "name": "Sample Nearest Surface",
+          "type": "GeometryNodeSampleNearestSurface",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Value": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Group ID": "0",
+            "Sample Position": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Sample Group ID": "0"
+          }
+        }
+      ],
+      "links": [
+        [
+          "Scale Elements",
+          "Geometry",
+          "Distribute Points on Faces",
+          "Mesh"
+        ],
+        [
+          "Distribute Points on Faces",
+          "Points",
+          "Instance on Points",
+          "Points"
+        ],
+        [
+          "Object Info",
+          "Geometry",
+          "Instance on Points",
+          "Instance"
+        ],
+        [
+          "Random Value",
+          "Value",
+          "Math",
+          "Value"
+        ],
+        [
+          "Math",
+          "Value",
+          "Instance on Points",
+          "Scale"
+        ],
+        [
+          "Distribute Points on Faces",
+          "Rotation",
+          "Align Euler to Vector",
+          "Rotation"
+        ],
+        [
+          "Distribute Points on Faces",
+          "Normal",
+          "Align Euler to Vector",
+          "Vector"
+        ],
+        [
+          "Vector Math",
+          "Vector",
+          "Vector Math.001",
+          "Vector"
+        ],
+        [
+          "Random Value.001",
+          "Value",
+          "Vector Math",
+          "Vector"
+        ],
+        [
+          "Align Euler to Vector",
+          "Rotation",
+          "Vector Math.001",
+          "Vector"
+        ],
+        [
+          "Vector Math.001",
+          "Vector",
+          "Instance on Points",
+          "Rotation"
+        ],
+        [
+          "Instance on Points",
+          "Instances",
+          "Translate Instances",
+          "Instances"
+        ],
+        [
+          "Math.002",
+          "Value",
+          "Translate Instances",
+          "Translation"
+        ],
+        [
+          "Scale Elements.001",
+          "Geometry",
+          "Capture Attribute",
+          "Geometry"
+        ],
+        [
+          "Normal",
+          "Normal",
+          "Capture Attribute",
+          "Value"
+        ],
+        [
+          "Switch",
+          "Output",
+          "Group Output",
+          "Geometry"
+        ],
+        [
+          "Capture Attribute",
+          "Geometry",
+          "Sample Nearest Surface",
+          "Mesh"
+        ],
+        [
+          "Capture Attribute",
+          "Value",
+          "Sample Nearest Surface",
+          "Value"
+        ],
+        [
+          "Sample Nearest Surface",
+          "Value",
+          "Group Output",
+          "Sphere Normals"
+        ],
+        [
+          "Rotate Instances",
+          "Instances",
+          "Realize Instances.001",
+          "Geometry"
+        ],
+        [
+          "Subdivision Surface",
+          "Mesh",
+          "Reroute",
+          "Input"
+        ],
+        [
+          "Scale Elements",
+          "Geometry",
+          "Subdivision Surface",
+          "Mesh"
+        ],
+        [
+          "Set Material",
+          "Geometry",
+          "Join Geometry",
+          "Geometry"
+        ],
+        [
+          "Realize Instances.001",
+          "Geometry",
+          "Set Material",
+          "Geometry"
+        ],
+        [
+          "Reroute",
+          "Output",
+          "Set Material.001",
+          "Geometry"
+        ],
+        [
+          "Group Input",
+          "Density",
+          "Distribute Points on Faces",
+          "Density"
+        ],
+        [
+          "Math.001",
+          "Value",
+          "Math",
+          "Value"
+        ],
+        [
+          "Group Input.001",
+          "Scale",
+          "Math.001",
+          "Value"
+        ],
+        [
+          "Group Input",
+          "Leaf Mesh Source",
+          "Object Info",
+          "Object"
+        ],
+        [
+          "Group Input.002",
+          "Sphere Material",
+          "Set Material.001",
+          "Material"
+        ],
+        [
+          "Group Input.002",
+          "Leaf Material",
+          "Set Material",
+          "Material"
+        ],
+        [
+          "Random Value.002",
+          "Value",
+          "Math.002",
+          "Value"
+        ],
+        [
+          "Group Input.003",
+          "Leaves Offset",
+          "Math.002",
+          "Value"
+        ],
+        [
+          "Group Input.003",
+          "Offset Random",
+          "Random Value.002",
+          "Max"
+        ],
+        [
+          "Group Input",
+          "Sphere Subdiv",
+          "Clamp",
+          "Value"
+        ],
+        [
+          "Set Material.001",
+          "Geometry",
+          "Join Geometry",
+          "Geometry"
+        ],
+        [
+          "Group.002",
+          "Geometry",
+          "Switch",
+          "True"
+        ],
+        [
+          "Group Input.004",
+          "Sphere Visibility",
+          "Switch",
+          "Switch"
+        ],
+        [
+          "Group.001",
+          "Geometry",
+          "Switch",
+          "False"
+        ],
+        [
+          "Group Input",
+          "Geometry",
+          "Scale Elements",
+          "Geometry"
+        ],
+        [
+          "Group Input",
+          "Scale Sphere",
+          "Scale Elements",
+          "Scale"
+        ],
+        [
+          "Group",
+          "Geometry",
+          "Scale Elements.001",
+          "Geometry"
+        ],
+        [
+          "Reroute",
+          "Output",
+          "Group",
+          "Geometry"
+        ],
+        [
+          "Set Material",
+          "Geometry",
+          "Group.001",
+          "Geometry"
+        ],
+        [
+          "Join Geometry",
+          "Geometry",
+          "Group.002",
+          "Geometry"
+        ],
+        [
+          "Group Input.004",
+          "Wind Intensity",
+          "Group.001",
+          "Wind Speed"
+        ],
+        [
+          "Group Input.004",
+          "Wind Noise Scale",
+          "Group.001",
+          "Wind Noise Scale"
+        ],
+        [
+          "Group Input.004",
+          "Wind Noise Detail",
+          "Group.001",
+          "Wind Noise Detail"
+        ],
+        [
+          "Group Input.004",
+          "Wind Intensity",
+          "Group.002",
+          "Wind Speed"
+        ],
+        [
+          "Group Input.004",
+          "Wind Noise Scale",
+          "Group.002",
+          "Wind Noise Scale"
+        ],
+        [
+          "Group Input.004",
+          "Wind Noise Detail",
+          "Group.002",
+          "Wind Noise Detail"
+        ],
+        [
+          "Group Input.005",
+          "Wind Intensity",
+          "Group",
+          "Wind Speed"
+        ],
+        [
+          "Group Input.005",
+          "Wind Noise Scale",
+          "Group",
+          "Wind Noise Scale"
+        ],
+        [
+          "Group Input.005",
+          "Wind Noise Detail",
+          "Group",
+          "Wind Noise Detail"
+        ],
+        [
+          "Group Input.004",
+          "Wind Mvt Range",
+          "Group.002",
+          "Wind Mvt Range"
+        ],
+        [
+          "Group Input.004",
+          "Wind Mvt Range",
+          "Group.001",
+          "Wind Mvt Range"
+        ],
+        [
+          "Group Input.005",
+          "Wind Mvt Range",
+          "Group",
+          "Wind Mvt Range"
+        ],
+        [
+          "Translate Instances",
+          "Instances",
+          "Rotate Instances",
+          "Instances"
+        ],
+        [
+          "Combine XYZ",
+          "Vector",
+          "Rotate Instances",
+          "Rotation"
+        ],
+        [
+          "Position",
+          "Position",
+          "Vector Math.002",
+          "Vector"
+        ],
+        [
+          "Object Info.001",
+          "Location",
+          "Vector Math.002",
+          "Vector"
+        ],
+        [
+          "Vector Math.002",
+          "Vector",
+          "Noise Texture",
+          "Vector"
+        ],
+        [
+          "Math.003",
+          "Value",
+          "Combine XYZ",
+          "Y"
+        ],
+        [
+          "Math.003",
+          "Value",
+          "Combine XYZ",
+          "X"
+        ],
+        [
+          "Noise Texture",
+          "Factor",
+          "Math.003",
+          "Value"
+        ],
+        [
+          "Group Input.006",
+          "Wind Rotate Intensity",
+          "Math.003",
+          "Value"
+        ],
+        [
+          "Group Input.006",
+          "Wind Noise Detail",
+          "Noise Texture",
+          "Detail"
+        ],
+        [
+          "Group Input.006",
+          "Wind Noise Scale",
+          "Noise Texture",
+          "Scale"
+        ],
+        [
+          "Group Input",
+          "Seed",
+          "Distribute Points on Faces",
+          "Seed"
+        ],
+        [
+          "Clamp",
+          "Result",
+          "Subdivision Surface",
+          "Level"
+        ]
+      ]
+    },
+    {
+      "name": "LeavesWind",
+      "nodes": [
+        {
+          "name": "Frame",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Frame.001",
+          "type": "NodeFrame",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Vector Math.003",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Vector Math.002",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "ADD",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Noise Texture",
+          "type": "ShaderNodeTexNoise",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "W": "0.0",
+            "Scale": "0.6399999856948853",
+            "Detail": "1.0",
+            "Roughness": "0.5249999761581421",
+            "Lacunarity": "2.0",
+            "Offset": "0.0",
+            "Gain": "1.0",
+            "Distortion": "0.0"
+          }
+        },
+        {
+          "name": "Set Position.002",
+          "type": "GeometryNodeSetPosition",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Position": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Offset": "<Vector (0.0000, 0.0000, 0.0000)>"
+          }
+        },
+        {
+          "name": "Set Position.003",
+          "type": "GeometryNodeSetPosition",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Selection": "True",
+            "Position": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Offset": "<Vector (-0.5000, -0.5000, -0.5000)>"
+          }
+        },
+        {
+          "name": "Group Output",
+          "type": "NodeGroupOutput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Vector Math.004",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Vector Math.005",
+          "type": "ShaderNodeVectorMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Vector": "<bpy_float[3], NodeSocketVector.default_value>",
+            "Scale": "1.0"
+          }
+        },
+        {
+          "name": "Math",
+          "type": "ShaderNodeMath",
+          "image": null,
+          "group": null,
+          "operation": "MULTIPLY",
+          "inputs": {
+            "Value": "0.5"
+          }
+        },
+        {
+          "name": "Object Info",
+          "type": "GeometryNodeObjectInfo",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {
+            "Object": "<bpy_struct, Object(\"TreeWind_empty\") at 0x00000279E195EB20>",
+            "As Instance": "False"
+          }
+        },
+        {
+          "name": "Position",
+          "type": "GeometryNodeInputPosition",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        },
+        {
+          "name": "Group Input.001",
+          "type": "NodeGroupInput",
+          "image": null,
+          "group": null,
+          "operation": null,
+          "inputs": {}
+        }
+      ],
+      "links": [
+        [
+          "Set Position.003",
+          "Geometry",
+          "Group Output",
+          "Geometry"
+        ],
+        [
+          "Group Input",
+          "Geometry",
+          "Set Position.002",
+          "Geometry"
+        ],
+        [
+          "Vector Math.005",
+          "Vector",
+          "Set Position.002",
+          "Offset"
+        ],
+        [
+          "Vector Math.004",
+          "Vector",
+          "Noise Texture",
+          "Vector"
+        ],
+        [
+          "Position",
+          "Position",
+          "Vector Math.002",
+          "Vector"
+        ],
+        [
+          "Vector Math.003",
+          "Vector",
+          "Vector Math.002",
+          "Vector"
+        ],
+        [
+          "Object Info",
+          "Location",
+          "Vector Math.003",
+          "Vector"
+        ],
+        [
+          "Vector Math.002",
+          "Vector",
+          "Vector Math.004",
+          "Vector"
+        ],
+        [
+          "Set Position.002",
+          "Geometry",
+          "Set Position.003",
+          "Geometry"
+        ],
+        [
+          "Group Input",
+          "Wind Speed",
+          "Vector Math.003",
+          "Vector"
+        ],
+        [
+          "Group Input",
+          "Wind Noise Scale",
+          "Noise Texture",
+          "Scale"
+        ],
+        [
+          "Group Input",
+          "Wind Noise Detail",
+          "Noise Texture",
+          "Detail"
+        ],
+        [
+          "Noise Texture",
+          "Factor",
+          "Vector Math.005",
+          "Vector"
+        ],
+        [
+          "Math",
+          "Value",
+          "Set Position.003",
+          "Offset"
+        ],
+        [
+          "Group Input.001",
+          "Wind Mvt Range",
+          "Math",
+          "Value"
+        ],
+        [
+          "Group Input.001",
+          "Wind Mvt Range",
+          "Vector Math.005",
+          "Vector"
+        ]
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "name": "Leaf",
+      "type": "MESH",
+      "materials": [
+        "Leaf"
+      ],
+      "modifiers": []
+    },
+    {
+      "name": "leavesSphere_Sample",
+      "type": "MESH",
+      "materials": [
+        "LeavesSphere"
+      ],
+      "modifiers": [
+        {
+          "name": "GeometryNodes",
+          "type": "NODES",
+          "group": "LeavesSphereGN"
+        }
+      ]
+    },
+    {
+      "name": "Sun",
+      "type": "LIGHT",
+      "materials": [],
+      "modifiers": []
+    },
+    {
+      "name": "treeTrunk_Sample",
+      "type": "CURVE",
+      "materials": [
+        "TreeBark"
+      ],
+      "modifiers": []
+    },
+    {
+      "name": "TreeWind_empty",
+      "type": "EMPTY",
+      "materials": [],
+      "modifiers": []
+    }
+  ]
+}
