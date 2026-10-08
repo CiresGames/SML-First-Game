@@ -43,6 +43,8 @@ namespace MantaFlight.Rider
         public void Tick(float dt)
         {
             if (dt <= 0) return;
+            if (manta.Progression != null && (manta.Progression.Failing || manta.Progression.Data.exhausted)) return;
+            if (landed && manta.Progression != null && !manta.Progression.CanFly) return;
             if (Mode == MantaServiceState.Piloted)
             {
                 if (rider.Mounted && input.State.brake >= S.hoverBrakeThreshold && manta.Speed <= S.hoverEntrySpeed
@@ -290,8 +292,25 @@ namespace MantaFlight.Rider
             }
             return false;
         }
-        public bool CanMountGround() => landed && !Calling && Velocity.magnitude<=S.dismountSpeed
-            && Vector3.Distance(rider.transform.position,seat.position)<=S.landedMountDistance;
+        public bool WithinGroundMountReach()
+        {
+            if (rider == null || seat == null) return false;
+            Vector3 feet = rider.transform.position;
+            if (Mathf.Abs(PhysicsSeatPosition.y - feet.y) > S.landedMountDistance) return false;
+            if (Vector3.Distance(feet, PhysicsSeatPosition) <= S.landedMountDistance) return true;
+            // The wings can prevent a standing rider from approaching the saddle. Measure
+            // reach to the actual shell as well, without using its much larger bounding box.
+            Vector3 from = feet + Vector3.up * (rider.Motor.Capsule.height * .5f);
+            Vector3 toBody = Position - from;
+            if (toBody.sqrMagnitude < .001f) return true;
+            var ray = new Ray(from, toBody.normalized);
+            foreach (var shell in GetComponentsInChildren<Collider>())
+                if (shell.enabled && !shell.isTrigger && shell.Raycast(ray, out _, Mathf.Min(toBody.magnitude, S.landedMountDistance)))
+                    return true;
+            return false;
+        }
+        public bool CanMountGround() => (manta.Progression == null || manta.Progression.CanFly) && landed && !Calling && Velocity.magnitude<=S.dismountSpeed
+            && WithinGroundMountReach();
         public void Dismount()
         {
             velocity = Velocity;
@@ -303,6 +322,7 @@ namespace MantaFlight.Rider
         public void ToggleCall() { if (Calling) CancelCall(); else CallToPosition(rider.transform.position, rider.Motor.Velocity, rider.Airborne); }
         public void CallToPosition(Vector3 position, Vector3 riderVelocity, bool airborne)
         {
+            if (manta.Progression != null && !manta.Progression.CanFly) return;
             if (Vector3.Distance(transform.position, position) > S.maximumCallDistance) return;
             if (!airborne)
             {
@@ -325,6 +345,8 @@ namespace MantaFlight.Rider
         }
         public bool RequestLanding(Vector3 point, Vector3 normal)
         {
+            if (manta.Progression != null && (manta.Progression.Failing || manta.Progression.Data.exhausted)) return false;
+            if (landed && manta.Progression != null && !manta.Progression.CanFly) return false;
             if (!IsLandingSurfaceValid(point, normal)) return false;
             stayAfterLanding = false;
             // Preserve current motion when taking ownership (the service velocity can be stale while piloted).
@@ -338,7 +360,7 @@ namespace MantaFlight.Rider
             Mode = MantaServiceState.Landing; landed = false; callTime = passTime = 0;
             manta.Paused = true; relativeValid = false; return true;
         }
-        public void OrderFollow() { velocity = manta.Velocity; StartFollowing(); manta.Paused = true; }
+        public void OrderFollow() { if (manta.Progression != null && !manta.Progression.CanFly) return; velocity = manta.Velocity; StartFollowing(); manta.Paused = true; }
         public void OrderStay()
         {
             velocity = manta.Velocity; Mode = MantaServiceState.Stay; stayAfterLanding = false;
@@ -360,10 +382,18 @@ namespace MantaFlight.Rider
         public void BeginCatch(Vector3 riderVelocity) { Mode = MantaServiceState.Catch; velocity = Vector3.Lerp(velocity, riderVelocity, .8f); }
         public void AttachRider()
         {
+            if (manta.Progression != null && !manta.Progression.CanFly) return;
             stayAfterLanding = false;
             float speed = Velocity.magnitude;
             Mode = MantaServiceState.Piloted; landed = false; AutonomousBank = 0; input.ControlEnabled = true; manta.Paused = false;
             manta.UpdateExternalVelocity(manta.Heading, manta.Heading * Vector3.forward * Mathf.Max(manta.settings.minimumSpeed, speed));
+        }
+        public void RestAfterExhaustion()
+        {
+            velocity = Vector3.zero; landed = true; relativeValid = false; stayAfterLanding = false;
+            Mode = MantaServiceState.Stay; AutonomousBank = 0;
+            manta.Paused = true; input.ControlEnabled = false;
+            manta.GetComponent<MantaManeuvers>().Cancel();
         }
         void OnDrawGizmosSelected()
         {

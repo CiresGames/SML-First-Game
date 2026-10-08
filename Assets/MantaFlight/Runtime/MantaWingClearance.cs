@@ -28,7 +28,7 @@ namespace MantaFlight
             {
                 var mesh = new Mesh(); renderer.BakeMesh(mesh);
                 foreach(var vertex in mesh.vertices) points.Add(root.InverseTransformPoint(renderer.transform.TransformPoint(vertex)));
-                Object.Destroy(mesh);
+                if (Application.isPlaying) Object.Destroy(mesh); else Object.DestroyImmediate(mesh);
             }
             if (points.Count == 0)
                 foreach (var joint in joints) if (joint) points.Add(root.InverseTransformPoint(joint.position));

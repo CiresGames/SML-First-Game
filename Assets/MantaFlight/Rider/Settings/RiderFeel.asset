@@ -19,8 +19,8 @@ MonoBehaviour:
     acceleration: 14
     deceleration: 20
     turnRate: 210
-    gravity: 27
-    jumpHeight: 1.15
+    gravity: 18
+    jumpHeight: 1.7
     airAcceleration: 3
     terminalSpeed: 65
     standingHeight: 1.8
@@ -129,6 +129,8 @@ MonoBehaviour:
     followTargetSmoothing: 0.08
     followSway: 1.2
     followSwayPeriod: 5
+    landingTurnRate: 75
+    landingFlareDistance: 10
     maximumLandingSlope: 40
     landingAimRange: 70
     landingProbeHeight: 25

@@ -17,6 +17,7 @@ Open `Assets/MantaFlight/Scenes/MantaFlight.unity` and enter Play Mode. The ride
 | Step off / contextual mount | F | X |
 | Jump off into free fall | J | D-pad left while mounted |
 | Deploy / retract wingsuit | G | Y while airborne |
+| Manta Info (nearby on foot or mounted) | P | Y / Triangle |
 | Drop without wingsuit | K | D-pad down |
 | Call / cancel in air; hold to aim landing on foot, release to confirm | H | D-pad up |
 | Invert wingsuit pitch | I or debug button | D-pad right |

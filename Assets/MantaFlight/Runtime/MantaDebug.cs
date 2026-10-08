@@ -57,9 +57,9 @@ namespace MantaFlight
         void ToggleHud() { hudVisible = !hudVisible; hud.SetActive(hudVisible && !input.MenuOpen); hint.SetActive(hudVisible && !input.MenuOpen); }
         void MenuChanged()
         {
-            menu.SetActive(input.MenuOpen);
+            menu.SetActive(input.SettingsMenuOpen);
             hud.SetActive(hudVisible && !input.MenuOpen); hint.SetActive(hudVisible && !input.MenuOpen);
-            if (input.MenuOpen) EventSystem.current.SetSelectedGameObject(menu.GetComponentInChildren<UnityEngine.UI.Button>().gameObject);
+            if (input.SettingsMenuOpen) EventSystem.current.SetSelectedGameObject(menu.GetComponentInChildren<UnityEngine.UI.Button>().gameObject);
         }
         void Update()
         {
@@ -79,6 +79,7 @@ namespace MantaFlight
             menu = panel.gameObject;
             Label(panel, "L’ATELIER DU VOL", new Vector2(32, -22), new Vector2(800, 50), 34, Accent);
             Button(panel, "REPRENDRE", new Vector2(1240, -26), new Vector2(225, 44), () => input.SetMenu(false));
+            Button(panel, "MANTA INFO", new Vector2(980, -26), new Vector2(225, 44), () => controller.GetComponent<MantaProgressionPanel>()?.Open());
             Label(panel, "Réglages de session • retour aux valeurs de l’asset à la prochaine lecture", new Vector2(32, -78), new Vector2(1350, 34), 20, Color.white);
             var s = controller.settings;
             float y = -145;

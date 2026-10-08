@@ -10,9 +10,10 @@ namespace MantaFlight
         [Tooltip("Réactivité de la compensation des rafales, par seconde.")][Min(.1f)] public float windResponse = 2;
         Vector3 windVelocity;
         public Vector3 WindDriftVelocity => windVelocity;
+        public MantaProgression Progression { get; private set; }
         public Vector3 SampleWindDrift(float dt)
         {
-            windVelocity = Vector3.Lerp(windVelocity, WindManager.GetWindAt(PhysicsPosition) * windDrift,
+            windVelocity = Vector3.Lerp(windVelocity, WindManager.GetWindAt(PhysicsPosition) * windDrift * (Progression == null ? 1 : Progression.WindMultiplier),
                 MantaFlightSettings.Damp(windResponse, dt));
             return windVelocity;
         }
@@ -47,11 +48,13 @@ namespace MantaFlight
             spawnPosition = transform.position; spawnRotation = transform.rotation;
             input.ResetRequested += ResetFlight;
             ResetFlight();
+            Progression = GetComponent<MantaProgression>();
+            if (Progression == null) Progression = gameObject.AddComponent<MantaProgression>();
         }
         void OnDestroy() { if (input != null) input.ResetRequested -= ResetFlight; if (settings != null) Destroy(settings); }
         void FixedUpdate()
         {
-            if (Paused || input.MenuOpen) return;
+            if (Paused || input.MenuOpen || (Progression != null && Progression.Failing)) return;
             var trick = input.ConsumeTrick();
             if (trick != MantaTrick.None) maneuvers.TryStart(trick, this, input.State.steering.x);
             Simulate(input.State, Time.fixedDeltaTime);
@@ -59,6 +62,11 @@ namespace MantaFlight
         public void Simulate(FlightInput state, float dt)
         {
             var s = settings;
+            float speedBonus = Progression == null ? 1 : Progression.SpeedMultiplier;
+            float turnBonus = Progression == null ? 1 : Progression.TurnMultiplier;
+            float responseBonus = Progression == null ? 1 : Progression.ResponseMultiplier;
+            float powerBonus = Progression == null ? 1 : Progression.AccelerationMultiplier;
+            float climbBonus = Progression == null ? 1 : Progression.ClimbMultiplier;
             bool advanced = s.Has(FlightPhase.AdvancedManeuvers);
             bool energy = s.Has(FlightPhase.SpeedAndCamera);
             bool tight = advanced && state.tightTurn;
@@ -66,27 +74,29 @@ namespace MantaFlight
             maneuvers.ProbeObstacles(this);
             if (!maneuvers.LocksSpeed)
             {
-                float power = state.throttle * s.acceleration * Mathf.Max(.1f, s.accelerationCurve.Evaluate(Speed01));
+                float power = state.throttle * s.acceleration * powerBonus * Mathf.Max(.1f, s.accelerationCurve.Evaluate(Speed01));
                 float drag = state.brake * s.deceleration;
                 if (state.throttle < .01f && state.brake < .01f)
-                    power += Mathf.Clamp(s.cruiseSpeed - Speed, -s.cruiseRelaxation, s.cruiseRelaxation);
+                    power += Mathf.Clamp(s.cruiseSpeed * speedBonus - Speed, -s.cruiseRelaxation, s.cruiseRelaxation) * powerBonus;
                 if (energy)
                 {
                     float vertical = (Heading * Vector3.forward).y;
                     power += Mathf.Max(0, -vertical) * s.diveAcceleration;
-                    drag += Mathf.Max(0, vertical) * s.climbDeceleration;
+                    drag += Mathf.Max(0, vertical) * s.climbDeceleration / Mathf.Max(.1f, climbBonus);
                 }
                 if (tight) drag += Mathf.Abs(state.steering.x) * s.tightTurnDrag;
-                float limit = energy ? s.diveMaximumSpeed : s.maximumSpeed;
-                if (Speed >= s.maximumSpeed) power -= state.throttle * s.acceleration * Mathf.Max(.1f, s.accelerationCurve.Evaluate(Speed01));
-                Speed = Mathf.Clamp(Speed + (power - drag) * dt, s.minimumSpeed, limit);
+                float limit = (energy ? s.diveMaximumSpeed : s.maximumSpeed) * speedBonus;
+                if (Speed >= s.maximumSpeed * speedBonus) power -= state.throttle * s.acceleration * powerBonus * Mathf.Max(.1f, s.accelerationCurve.Evaluate(Speed01));
+                Speed = Mathf.Clamp(Speed + (power - drag) * dt, s.minimumSpeed * Mathf.Min(1, speedBonus), limit);
             }
             if (!maneuvers.ControlsHeading)
             {
                 float verticalInput = Mathf.Clamp(state.steering.y - (energy ? state.dive : 0), -1, 1);
+                if (verticalInput > 0) verticalInput *= climbBonus;
                 float response = state.steering.sqrMagnitude > .001f || state.dive > .01f ? s.turnAcceleration : s.turnDamping;
-                yawRate = Mathf.Lerp(yawRate, state.steering.x * s.yawSpeed * Mathf.Lerp(.75f, 1.18f, Speed01) * (tight ? s.tightTurnMultiplier : 1), MantaFlightSettings.Damp(response, dt));
-                pitchRate = Mathf.Lerp(pitchRate, -verticalInput * s.pitchSpeed, MantaFlightSettings.Damp(response, dt));
+                response *= responseBonus;
+                yawRate = Mathf.Lerp(yawRate, state.steering.x * s.yawSpeed * turnBonus * Mathf.Lerp(.75f, 1.18f, Speed01) * (tight ? s.tightTurnMultiplier : 1), MantaFlightSettings.Damp(response, dt));
+                pitchRate = Mathf.Lerp(pitchRate, -verticalInput * s.pitchSpeed * turnBonus, MantaFlightSettings.Damp(response, dt));
                 yaw += yawRate * dt;
                 pitch = Mathf.Clamp(pitch + pitchRate * dt, -s.pitchLimit, s.pitchLimit);
                 Quaternion stableHeading = Quaternion.Euler(pitch, yaw, 0);
@@ -97,11 +107,11 @@ namespace MantaFlight
             float targetBank = -state.steering.x * s.maximumBanking * Mathf.Lerp(.55f, 1, Speed01) * (tight ? 1.55f : 1);
             targetBank = Mathf.Clamp(targetBank, -78, 78);
             float easedBank = Mathf.Lerp(Bank, targetBank, MantaFlightSettings.Damp(s.bankingSmoothing, dt));
-            Bank = Mathf.MoveTowards(Bank, easedBank, s.rollSpeed * dt);
+            Bank = Mathf.MoveTowards(Bank, easedBank, s.rollSpeed * responseBonus * dt);
             Vector3 wanted = Heading * Vector3.forward;
             Vector3 airVelocity = Velocity - windVelocity;
             Vector3 direction = Vector3.Slerp(airVelocity.sqrMagnitude > .01f ? airVelocity.normalized : wanted, wanted,
-                MantaFlightSettings.Damp(maneuvers.ControlsHeading ? 28 : s.momentumResponse * (tight ? 2 : 1), dt)).normalized;
+                MantaFlightSettings.Damp(maneuvers.ControlsHeading ? 28 : s.momentumResponse * responseBonus * (tight ? 2 : 1), dt)).normalized;
             if (maneuvers.HasTravelOverride) direction = maneuvers.TravelDirection;
             Velocity = direction * Speed + SampleWindDrift(dt);
             MoveSafely(Velocity * dt);
@@ -173,11 +183,12 @@ namespace MantaFlight
         public void BeginManeuverRelease(float uprightSpeed)
         {
             SyncAngles(); yawRate = pitchRate = 0;
-            recoveringOrientation = true; recoverySpeed = Mathf.Max(1, uprightSpeed);
+            recoveringOrientation = true; recoverySpeed = Mathf.Max(1, uprightSpeed) * (Progression == null ? 1 : Progression.ResponseMultiplier);
         }
         public void ResetFlight()
         {
             if (body == null) return;
+            if (Progression != null && !Progression.CanFly) return;
             maneuvers.ResetState(); Heading = spawnRotation; SyncAngles();
             yawRate = pitchRate = Bank = Acceleration = 0; recoveringOrientation = false;
             windVelocity = Vector3.zero;

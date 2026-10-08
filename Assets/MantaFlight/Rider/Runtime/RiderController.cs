@@ -13,6 +13,7 @@ namespace MantaFlight.Rider
         public bool startMounted = true;
         public RiderLandingTarget LandingTarget { get; private set; }
         public RiderCommandWheel CommandWheel { get; private set; }
+        public RiderTreeInteraction TreeInteraction { get; private set; }
         public RiderState State { get; private set; }
         public RiderGroundMotor Motor { get; private set; }
         public RiderGlideMotor Glide { get; private set; }
@@ -50,21 +51,30 @@ namespace MantaFlight.Rider
             CommandWheel = GetComponent<RiderCommandWheel>();
             if (CommandWheel == null) CommandWheel = gameObject.AddComponent<RiderCommandWheel>();
             CommandWheel.rider = this;
+            TreeInteraction = GetComponent<RiderTreeInteraction>();
+            if (TreeInteraction == null) TreeInteraction = gameObject.AddComponent<RiderTreeInteraction>();
+            TreeInteraction.rider = this;
         }
         void Start()
         {
             if (mount != null) { mount.rider = this; mount.manta.Respawned += ResetRider; }
             if (startMounted) ResetRider(); else SetState(RiderState.Falling);
         }
-        void OnDisable() { mountCollisions.Restore(); if (CommandWheel) CommandWheel.Cancel(); }
+        void OnDisable() { mountCollisions.Restore(); if (CommandWheel) CommandWheel.Cancel(); if (TreeInteraction) TreeInteraction.Cancel(); }
         void OnDestroy()
         { if (mount != null) mount.manta.Respawned -= ResetRider; if (settings != null) Destroy(settings); }
-        void Update() { if (!Paused) Tick(Input.Read(Time.deltaTime), Time.deltaTime); else CommandWheel.Cancel(); }
+        void Update()
+        {
+            if (mount != null && mount.manta.Progression != null && mount.manta.Progression.Failing)
+            { if (Attached) FollowSeat(); return; }
+            if (!Paused) Tick(Input.Read(Time.deltaTime), Time.deltaTime); else CommandWheel.Cancel();
+        }
         public void Tick(RiderCommand command, float dt)
         {
             if (dt <= 0) return;
             mountCollisions.Tick(this, dt);
-            bool ordersOwnInput = CommandWheel.Handle(ref command);
+            if (TreeInteraction.IsBusy) CommandWheel.Cancel();
+            bool ordersOwnInput = !TreeInteraction.IsBusy && CommandWheel.Handle(ref command);
             LookInput = command.look;
             LookBackHeld = command.lookBack;
             dt = Mathf.Min(dt,.05f); StateTime += dt; SinceDetach += dt;
@@ -92,6 +102,8 @@ namespace MantaFlight.Rider
                 case RiderState.Grounded:
                 case RiderState.Landing:
                     bool recovering = State == RiderState.Landing;
+                    if (!recovering && TreeInteraction.Tick(command, dt))
+                    { if (!Motor.Grounded) SetState(RiderState.Falling); break; }
                     Motor.GroundMove(command,forward,dt,recovering);
                     if (!Motor.Grounded) { SetState(RiderState.Falling); break; }
                     AirTime = 0;
@@ -170,17 +182,27 @@ namespace MantaFlight.Rider
             rollDirection = Vector3.ProjectOnPlane(Motor.Velocity,Vector3.up).sqrMagnitude > 1 ? Vector3.ProjectOnPlane(Motor.Velocity,Vector3.up).normalized : transform.forward;
             Motor.SetCrouched(true); rollCooldown = settings.ground.rollDuration + settings.ground.rollCooldown; SetState(RiderState.Rolling);
         }
-        public bool CanScoop => Airborne && !IgnoringMountCollisions && SinceDetach >= settings.mount.gracePeriod;
+        public bool CanScoop => (mount.manta.Progression == null || mount.manta.Progression.CanFly) && Airborne && !IgnoringMountCollisions && SinceDetach >= settings.mount.gracePeriod;
         public void BeginRemount()
         {
+            if (mount.manta.Progression != null && !mount.manta.Progression.CanFly) return;
             CommandWheel.Cancel();
             mountCollisions.Restore();
             transitionStart = transform.position; transitionRotation = transform.rotation; transitionVelocity = Motor.Velocity;
             Motor.Capsule.enabled = false; mount.BeginCatch(Motor.Velocity); SetState(RiderState.Remounting);
         }
         void FollowSeat() { transform.SetPositionAndRotation(mount.Seat.position,mount.Seat.rotation); Motor.Velocity = mount.Velocity; }
+        public void RecoverFromExhaustion(Vector3 position, Quaternion rotation)
+        {
+            TreeInteraction.Cancel();
+            CommandWheel.Cancel(); LandingTarget.CancelPreview(); mountCollisions.Restore();
+            transform.SetParent(null, true); Motor.Capsule.enabled = true; Motor.SetCrouched(false);
+            Motor.Place(position, rotation, Vector3.zero);
+            AirTime = SinceDetach = GlidePose = 0; SetState(RiderState.Grounded);
+        }
         public void ResetRider()
         {
+            TreeInteraction.Cancel();
             CommandWheel.Cancel();
             mountCollisions.Restore(); LandingTarget.CancelPreview(); mount.CancelCall(); Motor.Capsule.enabled = false; Motor.Velocity = Vector3.zero; GlidePose = 0; AirTime = SinceDetach = 0;
             mount.AttachRider(); SetState(RiderState.Mounted); FollowSeat();

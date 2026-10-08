@@ -9,6 +9,7 @@ namespace MantaFlight.Rider
         public AudioClip landingClip;
         public AnimationClip landingAnimation;
         public AnimationClip rollingAnimation;
+        AnimationClip punchAnimation;
         [Header("Jump / fall animation")]
         [Min(0)] public float fallAnimationDelay = .45f;
         [Min(0)] public float fallAnimationDownSpeed = 5f;
@@ -24,6 +25,7 @@ namespace MantaFlight.Rider
         {
             baseScale=model.localScale; basePosition=model.localPosition; baseRotation=model.localRotation;
             animator.applyRootMotion=false;
+            punchAnimation=Resources.Load<AnimationClip>("RiderAnimations/TreePunch");
             wind=gameObject.AddComponent<AudioSource>();wind.playOnAwake=false;wind.loop=true;wind.spatialBlend=0;
             float[] samples=new float[22050];uint seed=123456;
             float low=0;
@@ -32,6 +34,7 @@ namespace MantaFlight.Rider
         }
         void LateUpdate()
         {
+            animator.speed=rider.Paused?0:1;
             if(rider.Paused) {wind.Pause();return;} if(!wind.isPlaying)wind.UnPause();
             float dt=Time.deltaTime;
             flightPhase += dt * Mathf.Lerp(2.5f, 8f, Mathf.InverseLerp(8, rider.settings.glide.maximumSpeed, rider.Motor.Velocity.magnitude));
@@ -46,6 +49,13 @@ namespace MantaFlight.Rider
             if(rider.Glide.Stalled && rider.GlidePose>.5f)pose*=Quaternion.Euler(Mathf.Sin(Time.time*8)*9,0,Mathf.Sin(Time.time*6)*10);
             model.localRotation=baseRotation*pose;
             model.localPosition=basePosition;
+            if(rider.TreeInteraction.PlayingPunch)
+            {
+                float t=rider.TreeInteraction.PunchTime;
+                float lunge=Mathf.SmoothStep(0,1,Mathf.InverseLerp(.21f,.34f,t))
+                    * (1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.40f,.55f,t)));
+                model.localPosition+=Vector3.forward*(.2f*lunge);
+            }
             model.localScale=baseScale;
             float feel=rider.Airborne?Mathf.InverseLerp(4,rider.settings.glide.maximumSpeed,rider.Motor.Velocity.magnitude):0;
             wind.volume=Mathf.Lerp(wind.volume,feel*rider.settings.glide.windVolume,dt*4);
@@ -72,6 +82,8 @@ namespace MantaFlight.Rider
                     if(landingAnimation!=null) playback=landingAnimation.length/Mathf.Max(.1f,rider.LandingDuration);
                     break;
                 case RiderState.Grounded:
+                    if(rider.TreeInteraction.PlayingPunch)
+                    { next="TreePunch"; playback=punchAnimation?punchAnimation.length/RiderTreeInteraction.PunchDuration:1; break; }
                     next=rider.Motor.Crouched?"Crouch":"Locomotion";
                     if(rider.Motor.Crouched) playback=Mathf.Clamp(speed/Mathf.Max(.1f,rider.settings.ground.crouchSpeed),0,1.5f);
                     break;
@@ -85,7 +97,7 @@ namespace MantaFlight.Rider
             animator.SetFloat("ActionSpeed",playback);
             if(next==currentAnimation)return;
             // The movement state owns timing; root motion must never move the capsule.
-            animator.CrossFadeInFixedTime(next,next=="Roll" || next=="Land"?.05f:.15f,0,0);
+            animator.CrossFadeInFixedTime(next,next=="Roll" || next=="Land" || next=="TreePunch"?.05f:.15f,0,0);
             currentAnimation=next;
         }
         public static bool ShouldPlayFall(float airTime, float verticalSpeed, float delay, float downSpeed, bool wasFalling)

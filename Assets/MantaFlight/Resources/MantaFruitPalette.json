@@ -1,0 +1,9 @@
+{
+  "entries": [
+    { "stat": "Speed", "hex": "33CCFF", "shape": "Teardrop", "resource": "MantaFruits/Speed" },
+    { "stat": "Manoeuvrability", "hex": "B373FF", "shape": "Twisted star", "resource": "MantaFruits/Manoeuvrability" },
+    { "stat": "Endurance", "hex": "4DFF80", "shape": "Pear", "resource": "MantaFruits/Endurance" },
+    { "stat": "Force", "hex": "FFA633", "shape": "Ribbed pumpkin", "resource": "MantaFruits/Force" },
+    { "stat": "Obedience", "hex": "FF66A6", "shape": "Heart", "resource": "MantaFruits/Obedience" }
+  ]
+}

@@ -79,11 +79,12 @@ namespace MantaFlight.Rider.Editor
                 Check(r.mount.CanDismount(out _),"Low stationary manta permits a clear ground dismount");
                 Step(new RiderCommand{context=true});Advance(1.6f);
                 Check(r.State==RiderState.Grounded && r.mount.Mode==MantaServiceState.Idle,"Step-off reaches ground and manta hovers idle");
-                r.PlaceForTest(origin,Vector3.down,RiderState.Falling);Advance(.5f);
                 r.mount.manta.SetExternalMotion(origin+new Vector3(30,20,0),Quaternion.identity,Vector3.zero);
+                // Move the shell away before putting the standing capsule on the test floor.
+                r.PlaceForTest(origin+Vector3.up*.05f,Vector3.down,RiderState.Falling);Advance(.5f);
                 r.mount.ToggleCall();for(int i=0;i<700 && r.mount.Calling;i++){r.mount.Tick(.02f);Step();}
                 Check(!r.mount.Calling && r.mount.Mode==MantaServiceState.Idle,"Ground call lands the manta nearby");
-                var mountPoint=new Vector3(r.mount.Seat.position.x,origin.y,r.mount.Seat.position.z);
+                var mountPoint=new Vector3(r.mount.Seat.position.x,origin.y+.05f,r.mount.Seat.position.z)+r.mount.Seat.right*5;
                 r.Motor.Place(mountPoint,Quaternion.identity,Vector3.down);Advance(.5f);
                 Check(r.mount.CanMountGround(),"Landed manta exposes contextual mount window");
                 Step(new RiderCommand{context=true});Advance(.5f);Check(r.Mounted,"Ground contextual mount blends onto seat");

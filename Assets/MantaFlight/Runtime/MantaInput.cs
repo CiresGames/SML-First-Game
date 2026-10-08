@@ -27,7 +27,9 @@ namespace MantaFlight
         public bool LookBackHeld { get; private set; }
         public bool ControlEnabled { get; set; } = true;
         public FlightInput State { get; private set; }
-        public bool MenuOpen { get; private set; }
+        public bool MenuOpen => SettingsMenuOpen || ProgressionMenuOpen;
+        public bool SettingsMenuOpen { get; private set; }
+        public bool ProgressionMenuOpen { get; private set; }
         public string RebindingLabel { get; private set; }
         public event Action ResetRequested;
         public event Action MenuChanged;
@@ -138,9 +140,16 @@ namespace MantaFlight
         public void SetMenu(bool open)
         {
             if (!open) CancelRebind();
-            MenuOpen = open; queued = MantaTrick.None; mouseSteer = Vector2.zero; LookBackHeld=false;
+            SettingsMenuOpen = open; ProgressionMenuOpen = false; queued = MantaTrick.None; mouseSteer = Vector2.zero; LookBackHeld=false;
             LookDelta=Vector2.zero;
             State = default; Cursor.lockState = CursorLockMode.None; Cursor.visible = true;
+            MenuChanged?.Invoke();
+        }
+        public void SetProgressionMenu(bool open)
+        {
+            CancelRebind(); SettingsMenuOpen = false; ProgressionMenuOpen = open;
+            State = default; queued = MantaTrick.None; mouseSteer = Vector2.zero; LookDelta = Vector2.zero; LookBackHeld = false;
+            Cursor.lockState = open ? CursorLockMode.None : CursorLockMode.Locked; Cursor.visible = open;
             MenuChanged?.Invoke();
         }
         public void Rebind(string actionName, int bindingIndex)

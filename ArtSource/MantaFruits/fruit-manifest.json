@@ -1,0 +1,57 @@
+[
+  {
+    "stat": "Speed",
+    "hex": "#33CCFF",
+    "shape": "Teardrop",
+    "blender_dimensions": [
+      0.8999999761581421,
+      0.8999999761581421,
+      1.0
+    ],
+    "triangles": 4448
+  },
+  {
+    "stat": "Manoeuvrability",
+    "hex": "#B373FF",
+    "shape": "Twisted star",
+    "blender_dimensions": [
+      0.8999999761581421,
+      0.8999999761581421,
+      1.0
+    ],
+    "triangles": 5248
+  },
+  {
+    "stat": "Endurance",
+    "hex": "#4DFF80",
+    "shape": "Pear",
+    "blender_dimensions": [
+      0.8999999761581421,
+      0.8999999761581421,
+      1.0
+    ],
+    "triangles": 4352
+  },
+  {
+    "stat": "Force",
+    "hex": "#FFA633",
+    "shape": "Ribbed pumpkin",
+    "blender_dimensions": [
+      0.8999999761581421,
+      0.8999999761581421,
+      1.0
+    ],
+    "triangles": 4640
+  },
+  {
+    "stat": "Obedience",
+    "hex": "#FF66A6",
+    "shape": "Heart",
+    "blender_dimensions": [
+      0.8999999761581421,
+      0.8999999761581421,
+      1.0
+    ],
+    "triangles": 5248
+  }
+]
