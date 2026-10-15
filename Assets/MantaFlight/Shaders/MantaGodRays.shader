@@ -6,6 +6,8 @@ Shader "Hidden/Manta/God Rays"
         Cull Off ZWrite Off ZTest Always
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "MantaGpuField.hlsl"
+        float _UseGpuField;
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
         #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
         TEXTURE2D_X_FLOAT(_SceneDepth);
@@ -50,6 +52,15 @@ Shader "Hidden/Manta/God Rays"
             [unroll] for(int plane=0;plane<6;plane++)
                 if(dot(_CacheViewPlanes[plane].xyz,p)+_CacheViewPlanes[plane].w < -_CacheCullMargin) return 1;
             if(distance(p,_CacheOrigin.xyz)>_AirSettings.z+_CacheCullMargin) return 1;
+            if(_UseGpuField>.5)
+            {
+                // Only the cache evaluates GPU density. Keeping this out of Scatter
+                // avoids nested density marches and an FXC loop-validation failure.
+                float reach=min(12000,max(0,(_Layers.z+_Layers.w-p.y)/max(.12,_SunDirection.y)));
+                float stride=reach/16, optical=0;
+                [loop]for(int s=0;s<16;s++)optical+=FieldDensity(p+_SunDirection.xyz*((s+.5)*stride),0)*stride;
+                return exp(-optical).xxxx;
+            }
             return CloudTransmission(p,_SunDirection.xyz).xxxx;
         }
         float CachedCloudTransmission(float3 p)

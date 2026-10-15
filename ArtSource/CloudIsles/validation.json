@@ -1,0 +1,14 @@
+{
+  "scene": "Assets/MantaFlight/Scenes/MantaFlight.unity",
+  "saved": true,
+  "islands": 18,
+  "trees": 866,
+  "waterfalls": 16,
+  "legacyPreservedInactive": true,
+  "playerProgressionRestored": true,
+  "shaderErrors": [],
+  "flightTestSeconds": 20.235,
+  "flightTestDistanceMetres": 566.58,
+  "flightTestNewErrors": 0,
+  "restingRotationLengthSquared": 1
+}

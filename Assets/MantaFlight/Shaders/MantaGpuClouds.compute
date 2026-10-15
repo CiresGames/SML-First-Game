@@ -1,0 +1,120 @@
+#pragma kernel GenerateWeather
+#pragma kernel TraceClouds
+#pragma kernel ResolveHistory
+#pragma kernel BuildLightCache
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "MantaGpuField.hlsl"
+RWTexture2D<float4> _WeatherWrite;
+RWTexture2D<float4> _CloudWrite;
+RWTexture2D<float2> _DepthWrite;
+Texture2D<float> _SceneDepth;
+Texture2D<float4> _Current, _History;
+Texture2D<float2> _CurrentDepth, _HistoryDepth;
+
+float4x4 _InvVP, _PreviousVP;
+float4 _Camera, _Size, _Sun, _SunColor, _Ambient, _Trace, _HistorySettings, _WindDelta, _Lightning;
+int _Seed;
+RWTexture3D<float> _LightWrite;
+Texture3D<float> _LightCache;
+float4 _LightOrigin, _LightExtent;
+float4 _DetailLod, _ReceiverPlanes[6];
+[numthreads(4,4,4)] void BuildLightCache(uint3 id:SV_DispatchThreadID)
+{
+    if(any(id>=uint3(64,32,64)))return;
+    float3 p=_LightOrigin.xyz+(id+.5)/float3(64,32,64)*_LightExtent.xyz;
+    // Cull lighting receivers, not shadow casters. The expanded planes retain
+    // all trilinear neighbours used by visible cloud samples during fast turns.
+    [unroll]for(int plane=0;plane<6;plane++)
+        if(dot(_ReceiverPlanes[plane].xyz,p)+_ReceiverPlanes[plane].w<0){_LightWrite[id]=0;return;}
+    float optical=0,travel=0;
+    [unroll]for(int i=0;i<8;i++){float step=80+i*65;optical+=FieldDensity(p+_Sun.xyz*(travel+step*.5),false)*step;travel+=step;}
+    _LightWrite[id]=optical;
+}
+uint MantaWeatherHash(uint n){n^=n>>16;n*=0x7feb352d;n^=n>>15;n*=0x846ca68b;n^=n>>16;return n;}
+float Cell(int2 p,int seed,int period){uint2 q=(uint2)(p & (period-1));return (MantaWeatherHash(q.x*1597334677u^q.y*3812015801u^(uint)seed)&65535)/65535.;}
+float Noise(float2 p,int seed,int period){int2 i=(int2)floor(p);float2 f=frac(p);f=f*f*(3-2*f);return lerp(lerp(Cell(i,seed,period),Cell(i+int2(1,0),seed,period),f.x),lerp(Cell(i+int2(0,1),seed,period),Cell(i+1,seed,period),f.x),f.y);}
+[numthreads(8,8,1)] void GenerateWeather(uint3 id:SV_DispatchThreadID)
+{
+    if(any(id.xy>=256))return;float2 uv=(id.xy+.5)/256.;
+    float n=saturate(.5+(Noise(uv*8,_Seed,8)*.7+Noise(uv*16,_Seed+71,16)*.3-.5)*1.65);
+    _WeatherWrite[id.xy]=float4(n,Noise(uv*8,_Seed+129,8),n,1);
+}
+float2 Interval(float y,float dy,float bottom,float top)
+{
+    if(abs(dy)<1e-5)return y>bottom && y<top ? float2(0,_Trace.x) : float2(1,-1);
+    float2 t=(float2(bottom,top)-y)/dy;return float2(max(0,min(t.x,t.y)),min(_Trace.x,max(t.x,t.y)));
+}
+[numthreads(8,8,1)] void TraceClouds(uint3 id:SV_DispatchThreadID)
+{
+    if(any(id.xy>=(uint2)_Size.xy))return;
+    float2 uv=(id.xy+.5)/_Size.xy;
+    float raw=_SceneDepth.SampleLevel(sampler_LinearClamp,uv,0);
+    float3 farPos=ComputeWorldSpacePosition(uv,UNITY_RAW_FAR_CLIP_VALUE,_InvVP);
+    float3 ray=normalize(farPos-_Camera.xyz);
+    float3 surface=ComputeWorldSpacePosition(uv,raw,_InvVP);
+    float sceneDistance=abs(raw-UNITY_RAW_FAR_CLIP_VALUE)<.00001 ? _Trace.x : distance(surface,_Camera.xyz);
+    float2 a=Interval(_Camera.y,ray.y,_Layers.x,_Layers.x+_Layers.y*_FieldShape.z);
+    float2 b=Interval(_Camera.y,ray.y,_Layers.z,_Layers.z+_Layers.w);
+    float start=min(a.y>a.x ? a.x : _Trace.x,b.y>b.x ? b.x : _Trace.x);
+    float end=min(sceneDistance,max(a.y,b.y));
+    float3 light=0;float trans=1;float weightedDepth=0;float weight=0;
+    if(end>start)
+    {
+        float jitter=(MantaWeatherHash(id.x+id.y*65537u+(uint)_Trace.z*1597334677u)&65535)/65535.;
+        [loop] for(int i=0;i<(int)_Trace.y;i++)
+        {
+            // Quadratic spacing retains fine silhouettes near the viewer and
+            // progressively spends fewer samples per metre in the distance.
+            float u=i/_Trace.y, v=(i+1)/_Trace.y;
+            float step=(v*v-u*u)*(end-start);
+            float t=start+lerp(u*u,v*v,jitter)*(end-start);
+            float3 p=_Camera.xyz+ray*t;
+            float d=FieldDensity(p,1-smoothstep(_DetailLod.x,_DetailLod.y,t));
+            if(d>.00001)
+            {
+                float3 lightUV=saturate((p-_LightOrigin.xyz)/_LightExtent.xyz);
+                float optical=_LightCache.SampleLevel(sampler_LinearClamp,lightUV,0)+d*45;
+                float direct=exp(-optical);
+                float phase=.65+.9*pow(saturate(dot(ray,_Sun.xyz)),12);
+                float ambient=lerp(.36,1,saturate((p.y-_Layers.x)/max(50,_Layers.y)));
+                float3 color=_Ambient.rgb*ambient+_SunColor.rgb*(direct*phase+exp(-optical*.22)*.24);
+                if(_Lightning.w>0){float3 delta=p-_Lightning.xyz;color+=float3(.65,.8,1)*_Lightning.w*exp(-dot(delta,delta)/90000);}
+                color=lerp(color,_Ambient.rgb*1.8,1-exp(-t*.000025));
+                float alpha=1-exp(-d*step);float w=trans*alpha;
+                light+=w*color;weightedDepth+=w*t;weight+=w;trans*=1-alpha;
+                if(trans<.008)break;
+            }
+        }
+    }
+    _CloudWrite[id.xy]=float4(light,trans);
+    _DepthWrite[id.xy]=float2(weight>.0001 ? weightedDepth/weight : _Trace.x,sceneDistance);
+}
+[numthreads(8,8,1)] void ResolveHistory(uint3 id:SV_DispatchThreadID)
+{
+    if(any(id.xy>=(uint2)_Size.xy))return;
+    float2 uv=(id.xy+.5)/_Size.xy;float4 current=_Current.Load(int3(id.xy,0));float2 depths=_CurrentDepth.Load(int3(id.xy,0));
+    if(_HistorySettings.x<=0){_CloudWrite[id.xy]=current;_DepthWrite[id.xy]=depths;return;}
+    float3 ray=normalize(ComputeWorldSpacePosition(uv,UNITY_RAW_FAR_CLIP_VALUE,_InvVP)-_Camera.xyz);
+    float3 p=_Camera.xyz+ray*depths.x-_WindDelta.xyz;
+    float4 clip=mul(_PreviousVP,float4(p,1));float2 prevUV=clip.xy/max(.0001,clip.w)*.5+.5;
+#if UNITY_UV_STARTS_AT_TOP
+    prevUV.y=1-prevUV.y;
+#endif
+    float blend=_HistorySettings.x;
+    if(clip.w<=0 || any(prevUV<0) || any(prevUV>1))blend=0;
+    float4 history=_History.SampleLevel(sampler_LinearClamp,prevUV,0);
+    float2 oldDepth=_HistoryDepth.SampleLevel(sampler_LinearClamp,prevUV,0);
+    if(abs(oldDepth.y-depths.y)>max(25,depths.y*.06))blend=0;
+    // A noisy silhouette can legitimately alternate between sky and cloud.
+    // Rejecting on alpha difference prevents those samples from ever converging.
+    // Use cloud-depth rejection only when both estimates actually hit density;
+    // neighbourhood clamping still removes stale history around moving edges.
+    if(current.a<.95 && history.a<.95 && abs(oldDepth.x-depths.x)>max(150,depths.x*.15))blend*=.2;
+    float4 lo=current,hi=current;
+    [unroll]for(int y=-1;y<=1;y++)[unroll]for(int x=-1;x<=1;x++){float4 n=_Current.Load(int3(clamp((int2)id.xy+int2(x,y),int2(0,0),(int2)_Size.xy-1),0));lo=min(lo,n);hi=max(hi,n);}
+    history=clamp(history,lo,hi);
+    _CloudWrite[id.xy]=lerp(current,history,blend);
+    _DepthWrite[id.xy]=depths;
+}
+
+

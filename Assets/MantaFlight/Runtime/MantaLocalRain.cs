@@ -63,6 +63,7 @@ namespace MantaFlight
         }
         public float SampleRain(Vector3 p)
         {
+            if(MantaGpuWeather.Rendering)return MantaGpuWeather.Active.SampleRain(p);
             if(!clouds || banks==null || clouds.rain<=.001f) return 0;
             float result=0;
             foreach(var b in banks)
@@ -83,7 +84,7 @@ namespace MantaFlight
             previousViewerPosition=viewer.position;previousViewer=viewer;hasViewerPosition=true;
             ApplyMovementTilt();
             cacheTimer-=Time.deltaTime;
-            if(cacheTimer<=0) { banks=clouds.GetComponentsInChildren<MantaCloudLayerVolume>(); cacheTimer=1; }
+            if(cacheTimer<=0) { if(!MantaGpuWeather.Rendering)banks=clouds.GetComponentsInChildren<MantaCloudLayerVolume>(); cacheTimer=1; }
             Vector3 subject=player ? player.position+Vector3.up*2 : viewer.position;
             LocalRain=SampleRain(subject);
             // Local emitter only: leaving a wet footprint or entering solid shelter clears residual drops.

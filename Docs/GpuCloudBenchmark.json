@@ -1,0 +1,64 @@
+{
+    "gpu": "NVIDIA GeForce RTX 3080 Laptop GPU",
+    "measurement": "Offscreen scene render plus synchronous GPU readback and simulation; not gameplay FPS",
+    "width": 1920,
+    "height": 1080,
+    "results": [
+        {
+            "name": "Legacy fair",
+            "frames": 240,
+            "medianFrameMs": 23.824000000001179,
+            "p95FrameMs": 26.794500000001166,
+            "medianGpuMs": -1.0,
+            "gpuSamples": 0
+        },
+        {
+            "name": "GPU fair",
+            "frames": 240,
+            "medianFrameMs": 4.976899999999063,
+            "p95FrameMs": 5.4794999999998599,
+            "medianGpuMs": -1.0,
+            "gpuSamples": 0
+        },
+        {
+            "name": "GPU overcast",
+            "frames": 240,
+            "medianFrameMs": 5.360700000000662,
+            "p95FrameMs": 5.783399999998551,
+            "medianGpuMs": -1.0,
+            "gpuSamples": 0
+        },
+        {
+            "name": "GPU inside storm",
+            "frames": 240,
+            "medianFrameMs": 9.668899999997649,
+            "p95FrameMs": 10.430000000003048,
+            "medianGpuMs": -1.0,
+            "gpuSamples": 0
+        },
+        {
+            "name": "GPU fast flight",
+            "frames": 240,
+            "medianFrameMs": 5.24769999999819,
+            "p95FrameMs": 5.731499999999556,
+            "medianGpuMs": -1.0,
+            "gpuSamples": 0
+        },
+        {
+            "name": "GPU sunset",
+            "frames": 240,
+            "medianFrameMs": 5.218800000001522,
+            "p95FrameMs": 5.654599999999732,
+            "medianGpuMs": -1.0,
+            "gpuSamples": 0
+        },
+        {
+            "name": "GPU night",
+            "frames": 240,
+            "medianFrameMs": 4.722999999998478,
+            "p95FrameMs": 5.055200000001037,
+            "medianGpuMs": -1.0,
+            "gpuSamples": 0
+        }
+    ]
+}

@@ -33,12 +33,12 @@ Material:
     - _GalaxyBrightness: 2.3
     - _Stars: 0.4
     m_Colors:
-    - _Ground: {r: 0.47801143, g: 0.43454078, b: 0.43956795, a: 0.7}
-    - _Horizon: {r: 0.6828735, g: 0.62077254, b: 0.62795424, a: 1}
+    - _Ground: {r: 0.42000002, g: 0.532, b: 0.602, a: 0.7}
+    - _Horizon: {r: 0.6, g: 0.76, b: 0.86, a: 1}
     - _MoonColor: {r: 0.6, g: 0.87, b: 1.5, a: 1.5}
-    - _MoonDirection: {r: 0.4109413, g: -0.23344538, b: -0.8812666, a: 0}
-    - _SunColor: {r: 3.5, g: 2.1278553, b: 1.3158014, a: 3.5}
-    - _SunDirection: {r: -0.4109413, g: 0.23344538, b: 0.8812666, a: 0}
+    - _MoonDirection: {r: 0.50738275, g: -0.56640625, b: -0.64942026, a: 0}
+    - _SunColor: {r: 3.5, g: 3.279114, b: 2.8987818, a: 3.5}
+    - _SunDirection: {r: -0.50738275, g: 0.56640625, b: 0.64942026, a: 0}
     - _Zenith: {r: 0.08, g: 0.28, b: 0.55, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

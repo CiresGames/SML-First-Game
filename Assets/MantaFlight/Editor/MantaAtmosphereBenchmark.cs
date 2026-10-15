@@ -4,11 +4,11 @@ namespace MantaFlight.Editor
 {
     public static class MantaAtmosphereBenchmark
     {
-        public static string Run(string imagePath=null)
+        public static string Run(string imagePath=null,int width=1280,int height=720)
         {
             if(EditorApplication.isPlaying) throw new System.InvalidOperationException("Stop Play mode for a repeatable frozen scene.");
             var camera=Camera.main; var previous=camera.targetTexture; var active=RenderTexture.active;
-            var target=new RenderTexture(1280,720,24,RenderTextureFormat.ARGBHalf);
+            var target=new RenderTexture(width,height,24,RenderTextureFormat.ARGBHalf);
             var pixels=new Texture2D(1,1,TextureFormat.RGBA32,false);
             var times=new double[6];
             try
@@ -23,12 +23,12 @@ namespace MantaFlight.Editor
                 }
                 if(!string.IsNullOrEmpty(imagePath))
                 {
-                    var image=new Texture2D(1280,720,TextureFormat.RGBA32,false);
-                    image.ReadPixels(new Rect(0,0,1280,720),0,0,false);
+                    var image=new Texture2D(width,height,TextureFormat.RGBA32,false);
+                    image.ReadPixels(new Rect(0,0,width,height),0,0,false);
                     System.IO.File.WriteAllBytes(imagePath,image.EncodeToPNG()); Object.DestroyImmediate(image);
                 }
                 System.Array.Sort(times);
-                return "1280x720 frozen camera, 6 synchronous render+readback samples, median "+((times[2]+times[3])*.5).ToString("F2")+" ms; range "+times[0].ToString("F2")+"–"+times[5].ToString("F2")+" ms. Includes readback; not player FPS.";
+                return width+"x"+height+" frozen camera, 6 synchronous render+readback samples, median "+((times[2]+times[3])*.5).ToString("F2")+" ms; range "+times[0].ToString("F2")+"–"+times[5].ToString("F2")+" ms. Includes readback; not player FPS.";
             }
             finally
             {

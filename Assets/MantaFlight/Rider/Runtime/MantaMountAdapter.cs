@@ -391,6 +391,8 @@ namespace MantaFlight.Rider
         public void RestAfterExhaustion()
         {
             velocity = Vector3.zero; landed = true; relativeValid = false; stayAfterLanding = false;
+            // A restored exhausted save can rest before any landing has set this target.
+            landingRotation = manta.Heading;
             Mode = MantaServiceState.Stay; AutonomousBank = 0;
             manta.Paused = true; input.ControlEnabled = false;
             manta.GetComponent<MantaManeuvers>().Cancel();

@@ -27,7 +27,7 @@ namespace MantaFlight
         public Vector3 wind = new Vector3(2.8f, .12f, .8f);
         [System.NonSerialized] public Vector3 windVariation;
         public Vector3 CurrentWind=>wind+windVariation;
-        public void ResetSessionMotion() {windOffset=Vector3.zero;detailPhase=0;windVariation=Vector3.zero;}
+        public void ResetSessionMotion() {windOffset=Vector3.zero;detailPhase=0;windVariation=Vector3.zero;var gpu=GetComponent<MantaGpuWeather>();if(gpu)gpu.ResetMotion();}
         [Range(0f, 2f)] public float evolution = .35f;
         [Range(0,1)] public float rain;
         [Range(0,1)] public float overcast,thunder;
@@ -128,7 +128,7 @@ namespace MantaFlight
                 var volume=volumes[index];
                 if (!volume) continue;
                 var bounds=volume.bounds; bounds.Expand(Mathf.Max(0,cullingBias)*2);
-                bool culled=camera && frustumCulling && !GeometryUtility.TestPlanesAABB(cameraPlanes,bounds);
+                bool culled=(MantaGpuWeather.Rendering && MantaGpuWeather.SupportsCamera(camera)) || (camera && frustumCulling && !GeometryUtility.TestPlanesAABB(cameraPlanes,bounds));
                 volume.forceRenderingOff=culled;
                 if(culled) { CulledVolumes++; continue; }
                 VisibleVolumes++;

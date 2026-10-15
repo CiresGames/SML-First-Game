@@ -5,6 +5,7 @@ namespace MantaFlight
     // Two reused ribbons and one unshadowed light: no particle simulation or per-frame searches.
     public sealed class MantaStormLightning : MonoBehaviour
     {
+        public static Vector4 CloudFlash {get;private set;}
         public Material boltMaterial;
         [Tooltip("Seconds between electrical discharges at full storm intensity.")] public Vector2 interval=new Vector2(12,32);
         [Min(100)] public float visibleRange=3500;
@@ -55,6 +56,21 @@ namespace MantaFlight
             if(random==null)random=new System.Random(7342);
             if(!effects)Build();
             // Search only for an occasional strike, not for every frame.
+            if(MantaGpuWeather.Rendering)
+            {
+                var field=MantaGpuWeather.Active;var viewer=Camera.main;if(!viewer)return false;
+                for(int attempt=0;attempt<32;attempt++)
+                {
+                    var top=viewer.transform.position+new Vector3((Next()-.5f)*visibleRange,0,(Next()-.5f)*visibleRange);
+                    top.y=field.mainLayer.x+field.mainLayer.y*.3f;
+                    if(field.CoverageAt(top)<.8f)continue;
+                    var end=top-Vector3.up*Mathf.Min(700,field.mainLayer.y*.8f);
+                    if(Physics.Raycast(top,Vector3.down,out var hit,2500,groundMask,QueryTriggerInteraction.Ignore))end=hit.point;
+                    Fill(bolt,top,end,45);Fill(branch,bolt.GetPosition(10),Vector3.Lerp(top,end,.8f)+new Vector3(120,0,80),22);
+                    flash.transform.position=top;age=0;SetFlash(1);return true;
+                }
+                return false;
+            }
             banks=clouds.GetComponentsInChildren<MantaCloudLayerVolume>();
             var cam=Camera.main;if(!cam || banks.Length==0)return false;
             int start=random.Next(banks.Length);
@@ -77,10 +93,11 @@ namespace MantaFlight
         }
         void SetFlash(float pulse)
         {
+            CloudFlash=new Vector4(flash.transform.position.x,flash.transform.position.y,flash.transform.position.z,pulse*flashIntensity);
             bolt.enabled=branch.enabled=pulse>0;
             bolt.startColor=bolt.endColor=branch.startColor=branch.endColor=new Color(2,2.5f,3.5f,pulse);
             flash.enabled=pulse>0;flash.intensity=pulse*flashIntensity;
         }
-        void OnDisable(){if(effects) {if(Application.isPlaying)Destroy(effects);else DestroyImmediate(effects);}effects=null;}
+        void OnDisable(){CloudFlash=Vector4.zero;if(effects) {if(Application.isPlaying)Destroy(effects);else DestroyImmediate(effects);}effects=null;}
     }
 }

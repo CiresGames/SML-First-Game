@@ -21,7 +21,8 @@ namespace MantaFlight
             if(sky.RayStrength<=.001f && !surface) return;
             if(renderingData.cameraData.cameraType!=CameraType.Game && renderingData.cameraData.cameraType!=CameraType.SceneView) return;
             if(renderingData.cameraData.renderType!=CameraRenderType.Base) return;
-            pass.material=material; pass.cached=cacheCloudShadows || surface; pass.divisor=Mathf.Clamp(resolutionDivisor,2,4); renderer.EnqueuePass(pass);
+            // GPU density is integrated once in the cache, never once per air sample.
+            pass.material=material; pass.cached=cacheCloudShadows || surface || MantaGpuWeather.Rendering; pass.divisor=Mathf.Clamp(resolutionDivisor,2,4); renderer.EnqueuePass(pass);
         }
         sealed class AtmospherePass : ScriptableRenderPass
         {
@@ -66,6 +67,9 @@ namespace MantaFlight
                 var cache=graph.CreateTexture(cacheDesc);
                 full.name="Manta atmosphere composite"; var output=graph.CreateTexture(full);
                 var block=new MaterialPropertyBlock();
+                bool gpu=MantaGpuWeather.Rendering;
+                block.SetFloat("_UseGpuField",gpu ? 1 : 0);
+                if(gpu)MantaGpuWeather.Active.Bind(block);
                 float fade=Mathf.Clamp01(sky.RayStrength/Mathf.Max(.001f,sky.rayIntensity));
                 block.SetVector("_AirSettings",new Vector4(sky.airExtinction*fade,sky.airHeight,sky.rayDistance,Mathf.Clamp(sky.raySamples,16,64)));
                 block.SetVector("_SunDirection",sky.SunDirection);
@@ -89,7 +93,7 @@ namespace MantaFlight
                 // Still analytic: no nested cloud-noise ray march for each air sample.
                 int count=0;
                 banks.Clear();
-                if(sky.clouds) sky.clouds.GetComponentsInChildren(false,banks);
+                if(sky.clouds && !gpu) sky.clouds.GetComponentsInChildren(false,banks);
                 if(sky.clouds)
                 foreach(var bank in banks)
                 {
@@ -135,6 +139,13 @@ namespace MantaFlight
             {
                 using(var builder=graph.AddRasterRenderPass<Data>(index==2 ? "Manta cloud shadow cache" : index==0 ? "Manta single scattering" : "Manta depth-aware atmosphere",out var d))
                 {
+                    if(index==2 && MantaGpuWeather.Rendering)
+                    {
+                        var f=MantaGpuWeather.Active;
+                        builder.UseTexture(graph.ImportTexture(f.WeatherHandle));
+                        builder.UseTexture(graph.ImportTexture(f.ShapeHandle));
+                        builder.UseTexture(graph.ImportTexture(f.DetailHandle));
+                    }
                     d.source=source; d.depth=depth; d.air=air; d.shadow=shadow; d.cache=cache; d.index=index; d.material=material; d.block=block;
                     if(index!=2) builder.UseTexture(depth,AccessFlags.Read);
                     if(index!=2 && cached) builder.UseTexture(cache,AccessFlags.Read);
