@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using MoreMountains.Feedbacks;
 using MoreMountains.Tools;
 using UnityEngine;
@@ -6,22 +7,52 @@ using UnityEngine.UI;
 public class ItemSoundControl : MonoBehaviour
 {
 
-    [SerializeField] SoundSO soundSo;
-    [SerializeField] MMF_Player player;
-    [SerializeField] Image image; 
+    public SoundSO soundSo;
+    [SerializeField] AudioSource player;
+    [SerializeField] Image image;
+    [SerializeField] GameObject playState; 
+    [SerializeField] Button button; 
 
 
-    private void InitializeSO(SoundSO soundSO)
+    public void InitializeSO(SoundSO soundSO)
     {
         image.sprite = soundSo.sprite;
-        player.GetFeedbackOfType<MMF_Sound>().Sfx = soundSo.clip; 
+        player.clip = soundSo.clip; 
 
     }
 
     private void Start()
     {
-        InitializeSO(soundSo); 
+        //InitializeSO(soundSo);
+        button.onClick.AddListener(PlayAudio);
+        PlayIconDisplay(IsPlaying()); 
     }
+
+    private bool IsPlaying()
+    {
+        bool isPlaying = player.isPlaying;
+        return isPlaying; 
+    }
+
+
+    private void PlayIconDisplay(bool flag)
+    {
+        playState.SetActive(flag);
+
+    }
+
+    private void Update()
+    {
+        PlayIconDisplay(IsPlaying());
+    }
+
+    private void PlayAudio()
+    {
+        if (!IsPlaying())
+            player.Play();
+        else player.Stop(); 
+    }
+
 
 
 

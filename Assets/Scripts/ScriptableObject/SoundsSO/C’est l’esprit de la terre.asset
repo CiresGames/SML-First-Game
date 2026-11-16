@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a4137396329c2d448e113413c7214fa, type: 3}
+  m_Name: "C\u2019est l\u2019esprit de la terre"
+  m_EditorClassIdentifier: 
+  soundName: "C\u2019est l\u2019esprit de la terre"
+  sprite: {fileID: 21300000, guid: cb691a9fb632c744e84de602cc46ff59, type: 3}
+  clip: {fileID: 8300000, guid: 29e8762b7e1532145bc811f2e02d3062, type: 3}
